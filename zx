@@ -3,11 +3,12 @@
 
 #__here_path="/$(lsof -p $$ | tail -n1 | cut -d '/' -f2-)"
 #__here_dir=$(dirname "${__here_path}")
+#__zx_source="./source/zx.lib.posix.sh"
 
-__zx_source="./source/zx.lib.posix.sh"
+. ./source/zx.lib.posix.sh
 
-. "${__zx_source}"
-
+#set -x
 __zx "${@}"
+#set +x
 
 unset __here_path __here_dir __zx_source
