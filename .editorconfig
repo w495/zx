@@ -1,8 +1,10 @@
+[*]
+ij_visual_guides = 72, 80, 120, 200
+
 [{*.sh,*.ash,*.osh,*.zsh,*.bash,*.dash}]
 indent_size = 2
 tab_width = 2
 
-ij_visual_guides = 72, 80, 120, 200
 ij_shell_binary_ops_start_line = false
 ij_shell_keep_column_alignment_padding = false
 ij_shell_minify_program = false

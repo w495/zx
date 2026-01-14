@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+# shellcheck enable=all
+
+#__here_path="/$(lsof -p $$ | tail -n1 | cut -d '/' -f2-)"
+#__here_dir=$(dirname "${__here_path}")
+
+__zx_source="./source/zx.lib.posix.sh"
+
+. "${__zx_source}"
+
+__zx "${@}"
+
+unset __here_path __here_dir __zx_source
