@@ -2,12 +2,11 @@
 # shellcheck enable=all
 #     shfmt -ci -i 2 -sr -s -bn -kp -ln posix -d
 
-#__here_path="/$(lsof -p $$ | tail -n1 | cut -d '/' -f2-)"
-#__here_dir=$(dirname "${__here_path}")
+__here_path="/$(lsof -p $$ | tail -n1 | cut -d '/' -f2-)"
+__here_dir=$(dirname "${__here_path}")
 
-__zx_source="../source/zx.lib.posix.sh"
-
-. "${__zx_source}"
+# shellcheck disable=SC1090
+. "${__here_dir}/../source/zx.lib.posix.sh"
 
 N_CHECKS=0
 N_OKS=0

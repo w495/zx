@@ -8,7 +8,7 @@
 
 ## NAME
 
-  «Colourful Echo» --> «C. Echo» --> «cecho».
+  «Colourful Echo» - «C. Echo» --> «cecho».
   It _sounds like /see‑EK‑oh/ in English. 
   But in Latin it is sounds like /tse‑kho/,
   That is similar to:
