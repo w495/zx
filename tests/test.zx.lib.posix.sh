@@ -15,7 +15,7 @@ N_FAILS=0
 check() {
   pat="${1}"
   shift
-  tval="$(__zx "${@}")"
+  tval="$(_zx "${@}")"
   N_CHECKS=$((N_CHECKS + 1))
   if test "${tval}" = "$(printf '%b' "${pat}")"; then
     printf '\tOk\t%+40b %-80s\n'  "${pat}" "zx ${*}"

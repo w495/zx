@@ -8,7 +8,7 @@ __here_dir=$(dirname "${__here_path}")
 . "${__here_dir}/source/zx.lib.posix.sh"
 
 #set -x
-__zx "${@}"
+_zx "${@}"
 #set +x
 
-unset __here_path __here_dir __zx_source
+unset __here_path __here_dir _zx_source
