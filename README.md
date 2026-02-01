@@ -22,25 +22,32 @@ So we use «Z» to represent /ts/-_sound.
 
 ## EXAMPLES
 
-    zx --fg red --bg yellow --te strikeout  some waring
+	zx --fg red --bg +yellow --te strikeout some strikeout waring
+
+	zx -pmYru magenta underlined text on a green field but all reversed
+
+	zx -anpg 'ABC '; printf 'DEF '; zx -anp.B 'GHI '; printf 'JKL'; zx -z
+
+	zx -an --fg cyan; printf 'some cyan text printed with printf '; zx -z
+
 
 ## OPTIONS
 
-|       |       |               |                     | Descr              |
-|------:|------:|--------------:|--------------------:|:-------------------|
-|   -f? | --fg= | --foreground= | --foreground-color= | see COLORS section |
-|   -b? | --bg= | --background= | --background-color= | see COLORS section |
-|   -t? | --te= |   --emphasis= |      --text-effect= |
-|   -t? | --em= |       --emph= |         --emphasis= |
-| -p??? | --ps= |        --pos= |       --positional= |
+|  ch | short |          word |                long | Description |
+|----:|------:|--------------:|--------------------:|-------------|
+| -f? | --fg= | --foreground= | --foreground-color= | see COLORS  |
+| -b? | --bg= | --background= | --background-color= | see COLORS  |
+| -t? | --te= |   --emphasis= |      --text-effect= | see EFFECTS |
+| -t? | --em= |       --emph= |         --emphasis= | see EFFECTS |
+| -p* | --ps= |        --pos= |       --positional= | see FORMS   |
 
 ## VIEW FLAGS
 
-|    |    |       |        |               |
-|----|----|-------|--------|---------------|
-| -a | -H | --ho  | --head |   --head-only |
-| -z | -T | --to  | --tail |   --tail-only |
-| -w | -P | --pw  | --wrap | --prompt-wrap |
+| Ch | Ch | shrt |   word |          long |                        |
+|---:|----|------|-------:|--------------:|------------------------|
+| -a | -H | --ho | --head |   --head-only | starts colourful text  |
+| -z | -T | --to | --tail |   --tail-only | ends colourful text    |
+| -w | -P | --pw | --wrap | --prompt-wrap | wraps for shell prompt |
 
 ## COLORS
 
