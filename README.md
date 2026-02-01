@@ -14,7 +14,7 @@
 
 It sounds like /see‑EK‑oh/ in English. 
 But in Latin it is sounds like /tse‑kho/,
-That is similar to:
+That[README.md](README.md) is similar to:
 * German «Zeche» — /tseh‑uhn/ — colliery;
 * Russian «Цех»  — /tsekh/    — workshop.
   
@@ -22,7 +22,7 @@ So we use «Z» to represent /ts/-_sound.
 
 ## EXAMPLES
 
-         zx --fg red --bg yellow --te strikeout  some waring
+    zx --fg red --bg yellow --te strikeout  some waring
 
 ## OPTIONS
 

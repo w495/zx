@@ -35,30 +35,39 @@ _zx__usage() {
   _zx
   _zx -tr '## EXAMPLES'
   _zx
-  _zx -e '\t zx --fg red --bg yellow --te strikeout  some waring'
-  _zx
-  _zx -e  --fg red --bg yellow --te strikeout  '\t some waring'
+  _zx -en '\t'
+  _zx 'zx --fg red --bg yellow --te strikeout some strikeout waring'
+  _zx -en '\t'
+  _zx --fg red --bg yellow --te strikeout some strikeout waring
+  _zx -en '\t'
+  _zx 'zx -pmcru magenta underlined text on a cyan field but all reversed'
+  _zx -en '\t'
+  _zx -pmcru magenta underlined text on a cyan field but all reversed
+  _zx -en '\t'
+  _zx 'zx -anpm M+; printf P1+; zx -anp.b C+; printf P+; _zx -z'
+  _zx -en '\t'
+  _zx -anpm M+
+  printf P1+
+  _zx -anp.b C+
+  printf P2+
+  _zx -z
   _zx
   _zx -tr '## OPTIONS'
-  _zx
-  _zx     '|        |       |               |                     |'
-  _zx     '|-------:|-------|---------------|---------------------|'
-  _zx -fr '|    -f? | --fg= | --foreground= | --foreground-color= |'
-  _zx -br '|    -b? | --bg= | --background= | --background-color= |'
-  _zx -tb '|    -t? | --te= |   --emphasis= |      --text-effect= |'
-  _zx -ti '|    -t? | --em= |       --emph= |         --emphasis= |'
-  _zx     '|  -p??? | --ps= |        --pos= |       --positional= |'
+  _zx -tc '|  ch | short |          word |                long | Description |'
+  _zx -tc '|----:|------:|--------------:|--------------------:|-------------|'
+  _zx -fr '| -f? | --fg= | --foreground= | --foreground-color= | see COLORS  |'
+  _zx -br '| -b? | --bg= | --background= | --background-color= | see COLORS  |'
+  _zx -tb '| -t? | --te= |   --emphasis= |      --text-effect= | see EFFECTS |'
+  _zx -ti '| -t? | --em= |       --emph= |         --emphasis= | see EFFECTS |'
+  _zx     '| -p* | --ps= |        --pos= |       --positional= | see FORMS   |'
   _zx
   _zx -tr '## VIEW FLAGS'
+  _zx -tc '| Ch | Ch | shrt |   word |          long |                        |'
+  _zx -tc '|---:|----|------|-------:|--------------:|------------------------|'
+  _zx     '| -a | -H | --ho | --head |   --head-only |'
+  _zx     '| -z | -T | --to | --tail |   --tail-only |'
+  _zx     '| -w | -P | --pw | --wrap | --prompt-wrap |'
   _zx
-  _zx '|    |    |       |        |               |'
-  _zx '|----|----|-------|--------|---------------|'
-  _zx '| -a | -H | --ho  | --head |   --head-only |'
-  _zx '| -z | -T | --to  | --tail |   --tail-only |'
-  _zx '| -w | -P | --pw  | --wrap | --prompt-wrap |'
-  _zx
-   
-   
   _zx -tr '## COLORS'
   _zx
   _zx -etc  '|      |\e[0m    |    |         |          |         |'
@@ -81,7 +90,7 @@ _zx__usage() {
   _zx -ef+w '| █▓▒░ |\e[0m +w | +7 | rgb+111 | +white   |         |'
   _zx
   _zx
-  _zx -tr '## TEXT EFFECTS '
+  _zx -tr '## EFFECTS '
   _zx
   _zx -etc '|           |\e[0m   |   |    |           |        |'
   _zx -etd '|-----------|\e[0m---|---|----|-----------|--------|'
