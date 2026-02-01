@@ -663,7 +663,7 @@ _zx__configure() {
         shift 1
         ;;
       -v | --version)
-        printf '0.1768393361'
+        printf '0.1769981220'
         shift 1
         ;;
       -a | -H | --ho | --head | --head-only)
