@@ -8,10 +8,6 @@ __here_dir=$(dirname "${__here_path}")
 # shellcheck disable=SC1090
 . "${__here_dir}/../source/zx.lib.posix.sh"
 
-N_CHECKS=0
-N_OKS=0
-N_FAILS=0
-
 check() {
   pat="${1}"
   shift
@@ -26,26 +22,28 @@ check() {
   fi
 }
 
-color_tests() {
-  echo 'FOREGROUND FORMS'
-
+test_foreground_forms () {
+  printf 'FOREGROUND FORMS\n'
   check '\0033[31m:r|g|b|w|c|m|y|k:\0033[0m' -fr ':r|g|b|w|c|m|y|k:'
   check '\0033[36m:r|g|b|w|c|m|y|k:\0033[0m' -fc ':r|g|b|w|c|m|y|k:'
   check '\0033[32m:red|blue|green|white|:\0033[0m' \
     --fg=green ':red|blue|green|white|:'
   check '\0033[35m:|cyan|magenta|yellow|black:\0033[0m' \
     --foreground=magenta ':|cyan|magenta|yellow|black:'
+}
 
-  echo 'BACKGROUND FORMS'
-
+test_background_forms () {
+  printf 'BACKGROUND FORMS\n'
   check '\0033[42m:r|g|b|w|c|m|y|k:\0033[0m' -bg ':r|g|b|w|c|m|y|k:'
   check '\0033[43m:r|g|b|w|c|m|y|k:\0033[0m' -by ':r|g|b|w|c|m|y|k:'
   check '\0033[44m:red|blue|green|white|:\0033[0m' \
     --bg=blue ':red|blue|green|white|:'
   check '\0033[46m:|cyan|magenta|yellow|black:\0033[0m' \
     --background=cyan ':|cyan|magenta|yellow|black:'
+}
 
-  echo 'COLOR FORMS +/-'
+test_color_plus_minus_forms() {
+  printf 'COLOR FORMS +/-\n'
   check '\0033[36m:dark color letter:\0033[0m' \
     -fc- ':dark color letter:'
   check '\0033[96m:bright color letter:\0033[0m' \
@@ -64,9 +62,10 @@ color_tests() {
     -f-red ':dark color minus:'
   check '\0033[91m:bright color plus:\0033[0m' \
     -f+red ':bright color plus:'
+}
 
-
-  echo 'COLOR SHORT FORMS'
+test_color_short_forms() {
+  printf 'COLOR SHORT FORMS\n'
   check '\0033[35m:dark color letters:\0033[0m' \
     --fg dm ':dark color letters:'
   check '\0033[35m:dark color letters:\0033[0m' \
@@ -79,7 +78,6 @@ color_tests() {
     --fg ik ':light color letters:'
   check '\0033[90m:light color letters:\0033[0m' \
     --fg ki ':light color letters:'
-
   check '\0033[31m:DARK COLOR LETTER:\0033[0m' \
     --fg R ':DARK COLOR LETTER:'
   check '\0033[31m:DARK COLOR LETTERS:\0033[0m' \
@@ -90,8 +88,10 @@ color_tests() {
     --fg red ':lowercase color:'
   check '\0033[31m:UPPERCASE COLOR:\0033[0m' \
     --fg RED ':UPPERCASE COLOR:'
+}
 
-  echo 'FOREGROUND DARK COLORS'
+test_foreground_dark_colors() {
+  printf 'FOREGROUND DARK COLORS\n'
   check '\0033[30m:basic black fg:\0033[0m' \
     --fg ba-black ':basic black fg:'
   check '\0033[31m:basic red fg:\0033[0m' \
@@ -108,8 +108,10 @@ color_tests() {
     --fg cyan-d ':basic cyan fg:'
   check '\0033[37m:basic white fg:\0033[0m' \
     --fg bawhite ':basic white fg:'
+}
 
-  echo 'FOREGROUND BRIGHT COLORS'
+test_foreground_bright_colors() {
+  printf 'FOREGROUND BRIGHT COLORS\n'
   check '\0033[90m:bright black fg:\0033[0m' \
     --fg bright+black ':bright black fg:'
   check '\0033[91m:bright red fg:\0033[0m' \
@@ -126,8 +128,10 @@ color_tests() {
     --fg lCyan ':bright cyan fg:'
   check '\0033[97m:bright white fg:\0033[0m' \
     --fg iwhite ':bright white fg:'
+}
 
-  echo 'BACKGROUND DARK COLORS'
+test_background_dark_colors() {
+  printf 'BACKGROUND DARK COLORS\n'
   check '\0033[40m:basic black bg:\0033[0m' \
     --bg basic-black ':basic black bg:'
   check '\0033[41m:basic red bg:\0033[0m' \
@@ -144,8 +148,10 @@ color_tests() {
     --bg basic-cyan ':basic cyan bg:'
   check '\0033[47m:basic white bg:\0033[0m' \
     --bg basic-white ':basic white bg:'
+}
 
-  echo 'BACKGROUND BRIGHT COLORS:'
+test_background_bright_colors() {
+  printf 'BACKGROUND BRIGHT COLORS:\n'
   check '\0033[100m:bright black bg:\0033[0m' \
     --bg bright-black ':bright black bg:'
   check '\0033[101m:bright red bg:\0033[0m' \
@@ -162,8 +168,49 @@ color_tests() {
     --bg bright-cyan ':bright cyan bg:'
   check '\0033[107m:bright white bg:\0033[0m' \
     --bg bright-white ':bright white bg:'
+}
 
-  echo 'RGB FORM COLORS'
+
+test_color_number_forms() {
+  printf 'NUMBER FORM COLORS\n'
+  check '\0033[30;100m:black -fg+bg:\0033[0m' \
+    -f-0 -b+0 ':black -fg+bg:'
+  check '\0033[90;40m:black +fg-bg:\0033[0m' \
+    -f+0 -b-0 ':black +fg-bg:'
+  check '\0033[31;101m:red -fg+bg:\0033[0m' \
+    -f-1 -b+1 ':red -fg+bg:'
+  check '\0033[91;41m:red +fg-bg:\0033[0m' \
+    -f+1 -b-1 ':red +fg-bg:'
+  check '\0033[32;102m:green -fg+bg:\0033[0m' \
+    -f-2 -b+2 ':green -fg+bg:'
+  check '\0033[92;42m:green -fg+bg:\0033[0m' \
+    -f+2 -b-2 ':green -fg+bg:'
+  check '\0033[33;103m:yellow -fg+bg:\0033[0m' \
+    -f-3 -b+3 ':yellow -fg+bg:'
+  check '\0033[93;43m:yellow +fg-bg:\0033[0m' \
+    -f+3 -b-3 ':yellow +fg-bg:'
+  check '\0033[34;104m:blue -fg+bg:\0033[0m' \
+    -f-4 -b+4 ':blue -fg+bg:'
+  check '\0033[94;44m:blue +fg-bg:\0033[0m' \
+    -f+4 -b-4 ':blue +fg-bg:'
+  check '\0033[35;105m:magenta -fg+bg:\0033[0m' \
+    -f-5 -b+5 ':magenta -fg+bg:'
+  check '\0033[95;45m:magenta +fg-bg:\0033[0m' \
+    -f+5 -b-5 ':magenta +fg-bg:'
+  check '\0033[36;106m:cyan -fg+bg:\0033[0m' \
+    -f-6 -b+6 ':cyan -fg+bg:'
+  check '\0033[96;46m:cyan +fg-bg:\0033[0m' \
+    -f+6 -b-6 ':cyan +fg-bg:'
+  check '\0033[37;107m:white -fg+bg:\0033[0m' \
+    -f-7 -b+7 ':white -fg+bg:'
+  check '\0033[97;47m:white +fg-bg:\0033[0m' \
+    -f+7 -b-7 ':white +fg-bg:'
+}
+
+
+
+test_color_rgb_forms() {
+  printf 'RGB FORM COLORS\n'
   check '\0033[30m:-black fg:\0033[0m' \
     --fg rgb-000 ':-black fg:'
   check '\0033[90m:+black fg:\0033[0m' \
@@ -196,45 +243,33 @@ color_tests() {
     --fg rgb-111 ':-white fg:'
   check '\0033[97m:+white fg:\0033[0m' \
     --fg rgb+111 ':+white fg:'
+}
 
-    echo 'NUMBER FORM COLORS'
-    check '\0033[30;100m:black -fg+bg:\0033[0m' \
-      -f-0 -b+0 ':black -fg+bg:'
-    check '\0033[90;40m:black +fg-bg:\0033[0m' \
-      -f+0 -b-0 ':black +fg-bg:'
-    check '\0033[31;101m:red -fg+bg:\0033[0m' \
-      -f-1 -b+1 ':red -fg+bg:'
-    check '\0033[91;41m:red +fg-bg:\0033[0m' \
-      -f+1 -b-1 ':red +fg-bg:'
-    check '\0033[32;102m:green -fg+bg:\0033[0m' \
-      -f-2 -b+2 ':green -fg+bg:'
-    check '\0033[92;42m:green -fg+bg:\0033[0m' \
-      -f+2 -b-2 ':green -fg+bg:'
-    check '\0033[33;103m:yellow -fg+bg:\0033[0m' \
-      -f-3 -b+3 ':yellow -fg+bg:'
-    check '\0033[93;43m:yellow +fg-bg:\0033[0m' \
-      -f+3 -b-3 ':yellow +fg-bg:'
-    check '\0033[34;104m:blue -fg+bg:\0033[0m' \
-      -f-4 -b+4 ':blue -fg+bg:'
-    check '\0033[94;44m:blue +fg-bg:\0033[0m' \
-      -f+4 -b-4 ':blue +fg-bg:'
-    check '\0033[35;105m:magenta -fg+bg:\0033[0m' \
-      -f-5 -b+5 ':magenta -fg+bg:'
-    check '\0033[95;45m:magenta +fg-bg:\0033[0m' \
-      -f+5 -b-5 ':magenta +fg-bg:'
-    check '\0033[36;106m:cyan -fg+bg:\0033[0m' \
-      -f-6 -b+6 ':cyan -fg+bg:'
-    check '\0033[96;46m:cyan +fg-bg:\0033[0m' \
-      -f+6 -b-6 ':cyan +fg-bg:'
-    check '\0033[37;107m:white -fg+bg:\0033[0m' \
-      -f-7 -b+7 ':white -fg+bg:'
-    check '\0033[97;47m:white +fg-bg:\0033[0m' \
-      -f+7 -b-7 ':white +fg-bg:'
-
-
-  echo 'TAB TEST'
+test_tab() {
+  printf 'TAB TEST\n'
   check '\0033[41m\tTAB TEST\t\0033[0m' \
     -br -e '\tTAB TEST\t'
+}
+
+
+
+
+tests() {
+  N_CHECKS=0
+  N_OKS=0
+  N_FAILS=0
+
+  test_foreground_forms
+  test_background_forms
+  test_color_plus_minus_forms
+  test_color_short_forms
+  test_foreground_dark_colors
+  test_foreground_bright_colors
+  test_background_dark_colors
+  test_background_bright_colors
+  test_color_rgb_forms
+  test_color_number_forms
+  test_tab
 
   printf 'Checks %5s\n' "${N_CHECKS}"
   printf 'Passed %5s\n' "${N_OKS}"
@@ -242,4 +277,4 @@ color_tests() {
 }
 
 
-color_tests
+tests
