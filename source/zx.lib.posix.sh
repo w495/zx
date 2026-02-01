@@ -17,9 +17,9 @@ _zx__usage() {
   _zx -tr '## USAGE'
   _zx
   _zx -td -fg '```'
-  _zx -n -tb     -- '   zx '
-  _zx -n -ti -tf -- '   [OPTIONS] '
-  _zx -n -ti     -- '   [TEXT]'
+  _zx -ntb     -- '   zx '
+  _zx -ntif    -- '   [OPTIONS] '
+  _zx -nti     -- '   [TEXT]'
   _zx
   _zx -td -fg '```'
   _zx
@@ -35,22 +35,46 @@ _zx__usage() {
   _zx
   _zx -tr '## EXAMPLES'
   _zx
+  _zx -tr '### KEY VALUE FORM'
+  _zx
   _zx -en '\t'
-  _zx 'zx --fg red --bg yellow --te strikeout some strikeout waring'
+  _zx "zx --fg red --bg +yellow --te strikeout some 'strikeout waring'"
   _zx -en '\t'
-  _zx --fg red --bg yellow --te strikeout some strikeout waring
+  _zx --fg red --bg +yellow --te strikeout 'some strikeout waring'
+  _zx
   _zx -en '\t'
-  _zx 'zx -pmcru magenta underlined text on a cyan field but all reversed'
+  _zx "zx -an --fg cyan; printf 'some cyan text printed with printf '; zx -z"
   _zx -en '\t'
-  _zx -pmcru magenta underlined text on a cyan field but all reversed
-  _zx -en '\t'
-  _zx 'zx -anpm M+; printf P1+; zx -anp.b C+; printf P+; _zx -z'
-  _zx -en '\t'
-  _zx -anpm M+
-  printf P1+
-  _zx -anp.b C+
-  printf P2+
+  _zx -an --fg cyan
+  printf 'some cyan text printed with printf'
   _zx -z
+  _zx
+  _zx -tr '### POSITIONAL FORM'
+  _zx
+  _zx -en '\t'
+  _zx "zx -p m!Y!u 'magenta underlined text on a yellow'"
+  _zx -en '\t'
+  _zx -p m!Y!u  'magenta underlined text on a yellow'
+  _zx
+  _zx -en '\t'
+  _zx "zx -p magenta/YELLOW/underline 'magenta underlined text on a yellow'"
+  _zx -en '\t'
+  _zx -p magenta/YELLOW/underline  'magenta underlined text on a yellow'
+  _zx
+  _zx -en '\t'
+  _zx "zx -pmYru 'magenta underlined text on a yellow field but all reversed'"
+  _zx -en '\t'
+  _zx -pmYru 'magenta underlined text on a yellow field but all reversed'
+  _zx
+  _zx -en '\t'
+  _zx "zx -anpgsx 'ABC '; printf 'DEF '; zx -anpsB 'GHI '; printf 'JKL'; zx -z"
+  _zx -en '\t'
+  _zx -an -pgsx 'ABC '
+  printf 'DEF '
+  _zx -an -psBx 'GHI '
+  printf 'JKL'
+  _zx -z
+
   _zx
   _zx -tr '## OPTIONS'
   _zx -tc '|  ch | short |          word |                long | Description |'
@@ -58,15 +82,15 @@ _zx__usage() {
   _zx -fr '| -f? | --fg= | --foreground= | --foreground-color= | see COLORS  |'
   _zx -br '| -b? | --bg= | --background= | --background-color= | see COLORS  |'
   _zx -tb '| -t? | --te= |   --emphasis= |      --text-effect= | see EFFECTS |'
-  _zx -ti '| -t? | --em= |       --emph= |         --emphasis= | see EFFECTS |'
+  _zx -ti '| -t? | --em= |       --emph= |         --emphasis= |             |'
   _zx     '| -p* | --ps= |        --pos= |       --positional= | see FORMS   |'
   _zx
   _zx -tr '## VIEW FLAGS'
   _zx -tc '| Ch | Ch | shrt |   word |          long |                        |'
   _zx -tc '|---:|----|------|-------:|--------------:|------------------------|'
-  _zx     '| -a | -H | --ho | --head |   --head-only |'
-  _zx     '| -z | -T | --to | --tail |   --tail-only |'
-  _zx     '| -w | -P | --pw | --wrap | --prompt-wrap |'
+  _zx     '| -a | -H | --ho | --head |   --head-only | starts colourful text  |'
+  _zx     '| -z | -T | --to | --tail |   --tail-only | ends colourful text    |'
+  _zx     '| -w | -P | --pw | --wrap | --prompt-wrap | wraps for shell prompt |'
   _zx
   _zx -tr '## COLORS'
   _zx
@@ -303,7 +327,7 @@ _zx_punct_to_sep() {
       +w | +7 | 97 | 107 | rgb+111 | +white)
         _zx__color__std_name__='bright white'
         ;;
-      '')
+      '' | [+-]n | [+-]s )
         _zx__color__std_name__='empty color'
         ;;
       *)
@@ -496,7 +520,7 @@ _zx__pos() {
   te_sep="${2:-${__ZX__FMT_SEP}}"
   pos_sep="${3}"
   case "${arg}" in
-    *[[:punct:]]*)
+    *[[:punct:]]* | [[:punct:]]* | *[[:punct:]])
       local_sep="${te_sep}"
       # COMPATIBILITY NOTE:
       # ---------------------------------------------------------
