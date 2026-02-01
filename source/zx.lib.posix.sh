@@ -35,19 +35,29 @@ __zx__usage() {
   __zx
   __zx -tr '## EXAMPLES'
   __zx
-  __zx '  zx --fg red --bg yellow --te strikeout  some waring'
-  __zx -n '\n  '
-  __zx --fg red --bg yellow --te strikeout  'some waring'
+  __zx -e '\t zx --fg red --bg yellow --te strikeout  some waring'
+  __zx
+  __zx -e  --fg red --bg yellow --te strikeout  '\t some waring'
   __zx
   __zx -tr '## OPTIONS'
   __zx
-  __zx -tc '|     |       |               |                     |'
-  __zx -td '|---- |-------|---------------|---------------------|'
-  __zx -fr '| -f? | --fg= | --foreground= | --foreground-color= |'
-  __zx -br '| -b? | --bg= | --background= | --background-color= |'
-  __zx -ti '| -t? | --te= |   --emphasis= |      --text-effect= |'
-  __zx -ti '| -t? | --em= |       --emph= |         --emphasis= |'
+  __zx     '|        |       |               |                     |'
+  __zx     '|-------:|-------|---------------|---------------------|'
+  __zx -fr '|    -f? | --fg= | --foreground= | --foreground-color= |'
+  __zx -br '|    -b? | --bg= | --background= | --background-color= |'
+  __zx -tb '|    -t? | --te= |   --emphasis= |      --text-effect= |'
+  __zx -ti '|    -t? | --em= |       --emph= |         --emphasis= |'
+  __zx     '|  -p??? | --ps= |        --pos= |       --positional= |'
   __zx
+  __zx -tr '## VIEW FLAGS'
+  __zx __zx '|    |    |       |        |               |'
+  __zx '|----|----|-------|--------|---------------|'
+  __zx '| -a | -H | --ho  | --head |   --head-only |'
+  __zx '| -z | -T | --to  | --tail |   --tail-only |'
+  __zx '| -w | -P | --pw  | --wrap | --prompt-wrap |'
+  __zx
+   
+   
   __zx -tr '## COLORS'
   __zx
   __zx -etc  '|      |\e[0m    |    |         |          |         |'
@@ -69,7 +79,8 @@ __zx__usage() {
   __zx -ef-w '| █▓▒░ |\e[0m -w | -7 | rgb-111 | -white   | white   |'
   __zx -ef+w '| █▓▒░ |\e[0m +w | +7 | rgb+111 | +white   |         |'
   __zx
-  __zx  __zx -tr '## TEXT EFFECTS '
+  __zx
+  __zx -tr '## TEXT EFFECTS '
   __zx
   __zx -etc '|           |\e[0m   |   |    |           |        |'
   __zx -etd '|-----------|\e[0m---|---|----|-----------|--------|'
@@ -631,7 +642,7 @@ __zx__configure() {
         opt_use_tail=true
         shift 1
         ;;
-      -w | -P | --pw | --wrap | --propt-wrap)
+      -w | -P | --pw | --wrap | --prompt-wrap)
         opt_esc_format="${opt_esc_format}+WRAPPED"
         shift 1
         ;;
