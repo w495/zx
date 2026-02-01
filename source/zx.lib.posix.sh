@@ -67,11 +67,11 @@ _zx__usage() {
   _zx -pmYru 'magenta underlined text on a yellow field but all reversed'
   _zx
   _zx -en '\t'
-  _zx "zx -anpgsx 'ABC '; printf 'DEF '; zx -anpsB 'GHI '; printf 'JKL'; zx -z"
+  _zx "zx -anpgex 'ABC '; printf 'DEF '; zx -anpeB 'GHI '; printf 'JKL'; zx -z"
   _zx -en '\t'
-  _zx -an -pgsx 'ABC '
+  _zx -anpgex 'ABC '
   printf 'DEF '
-  _zx -an -psBx 'GHI '
+  _zx -anpeB 'GHI '
   printf 'JKL'
   _zx -z
 
@@ -118,7 +118,7 @@ _zx__usage() {
   _zx
   _zx -etc '|           |\e[0m   |   |    |           |        |'
   _zx -etd '|-----------|\e[0m---|---|----|-----------|--------|'
-  _zx -et0 '|     reset |\e[0m 0 | n |    | clear     | reset  |'
+  _zx -et0 '|     reset |\e[0m 0 |   |    | clear     | reset  |'
   _zx -etb '|      bold |\e[0m 1 | b |    | bold      |        |'
   _zx -etf '|     faint |\e[0m 2 | f |    | faint     |        |'
   _zx -etd '|       dim |\e[0m 2 | d |    | dim       |        |'
@@ -155,7 +155,7 @@ _zx_punct_to_sep() {
 { # _zx__text_effect__*
   _zx__text_effect__code() {
     case $(awk -vi="${1}" 'BEGIN{$0=X;print tolower(i)}') in
-      0 | n | clear | reset)
+      0 | clear | reset)
         _zx__text_effect__code__=0
         ;;
       1 | b | bold)
@@ -182,7 +182,7 @@ _zx_punct_to_sep() {
       9 | s | x | strike* | del)
         _zx__text_effect__code__=9
         ;;
-      '')
+      '' | e | empty )
         _zx__text_effect__code__=-1
         ;;
       *)
@@ -246,10 +246,10 @@ _zx_punct_to_sep() {
 { # _zx__color__*
   _zx__color__code_case() {
     case ${1} in
-      [[:lower:]])
+      [[:lower:]]*)
         _zx__color__code_case__="-${1}"
         ;;
-      [[:upper:]])
+      [[:upper:]]*)
         _zx__color__code_case__="+${1}"
         ;;
       *)
@@ -327,7 +327,7 @@ _zx_punct_to_sep() {
       +w | +7 | 97 | 107 | rgb+111 | +white)
         _zx__color__std_name__='bright white'
         ;;
-      '' | [+-]n | [+-]s )
+      '' | [+-]e | e | [+-]empty | empty )
         _zx__color__std_name__='empty color'
         ;;
       *)
