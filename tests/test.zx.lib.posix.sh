@@ -21,9 +21,10 @@ check() {
     printf '\tFail\t%+40b %s != %b\n'  "${bpat}"  "zx ${*}"  "${tval}"
     N_FAILS=$((N_FAILS + 1))
   fi
+  unset bpat tval
 }
 
-test_foreground_forms () {
+test_foreground_forms()  {
   printf 'FOREGROUND FORMS\n'
   check '\0033[31m:r|g|b|w|c|m|y|k:\0033[0m' -fr ':r|g|b|w|c|m|y|k:'
   check '\0033[36m:r|g|b|w|c|m|y|k:\0033[0m' -fc ':r|g|b|w|c|m|y|k:'
@@ -33,7 +34,7 @@ test_foreground_forms () {
     --foreground=magenta ':|cyan|magenta|yellow|black:'
 }
 
-test_background_forms () {
+test_background_forms()  {
   printf 'BACKGROUND FORMS\n'
   check '\0033[42m:r|g|b|w|c|m|y|k:\0033[0m' -bg ':r|g|b|w|c|m|y|k:'
   check '\0033[43m:r|g|b|w|c|m|y|k:\0033[0m' -by ':r|g|b|w|c|m|y|k:'
@@ -162,7 +163,6 @@ test_background_bright_colors() {
     --bg bright-white ':bright white bg:'
 }
 
-
 test_color_number_forms() {
   printf 'NUMBER FORM COLORS\n'
   check '\0033[30;100m:black -fg+bg:\0033[0m'     -f-0 -b+0 ':black -fg+bg:'
@@ -208,7 +208,6 @@ test_tab() {
   check '\0033[41m\tTAB TEST\t\0033[0m' -br -e '\tTAB TEST\t'
 }
 
-
 test_positional_short() {
   printf 'SHORT POSITIONAL TEST\n'
   check '\0033[31m:fg=red,bg=empty,em=empty:\0033[0m' \
@@ -236,7 +235,6 @@ test_positional_long() {
 
 }
 
-
 tests() {
   N_CHECKS=0
   N_OKS=0
@@ -256,11 +254,11 @@ tests() {
   test_positional_short
   test_positional_long
 
-
   printf 'Checks %5s\n' "${N_CHECKS}"
   printf 'Passed %5s\n' "${N_OKS}"
   printf 'Failed %5s\n' "${N_FAILS}"
-}
 
+  unset N_CHECKS N_OKS N_FAILS
+}
 
 tests

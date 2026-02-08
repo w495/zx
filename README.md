@@ -22,14 +22,17 @@ So we use «Z» to represent /ts/-_sound.
 
 ## EXAMPLES
 
-	zx --fg red --bg +yellow --te strikeout some strikeout waring
+	zx -p m!Y!u 'magenta underlined text on a yellow'
+	magenta underlined text on a yellow
 
-	zx -pmYru magenta underlined text on a green field but all reversed
+	zx -p magenta/YELLOW/underline 'magenta underlined text on a yellow'
+	magenta underlined text on a yellow
 
-	zx -anpg 'ABC '; printf 'DEF '; zx -anp.B 'GHI '; printf 'JKL'; zx -z
+	zx -pmYru 'magenta underlined text on a yellow field but all reversed'
+	magenta underlined text on a yellow field but all reversed
 
-	zx -an --fg cyan; printf 'some cyan text printed with printf '; zx -z
-
+	zx -anpgex 'ABC '; printf 'DEF '; zx -anpeB 'GHI '; printf 'JKL'; zx -z
+	ABC DEF GHI JKL
 
 ## OPTIONS
 
@@ -38,7 +41,7 @@ So we use «Z» to represent /ts/-_sound.
 | -f? | --fg= | --foreground= | --foreground-color= | see COLORS  |
 | -b? | --bg= | --background= | --background-color= | see COLORS  |
 | -t? | --te= |   --emphasis= |      --text-effect= | see EFFECTS |
-| -t? | --em= |       --emph= |         --emphasis= | see EFFECTS |
+| -t? | --em= |       --emph= |         --emphasis= |             |
 | -p* | --ps= |        --pos= |       --positional= | see FORMS   |
 
 ## VIEW FLAGS
@@ -70,12 +73,12 @@ So we use «Z» to represent /ts/-_sound.
 | █▓▒░ | -w | -7 | rgb-111 | -white   | white   |
 | █▓▒░ | +w | +7 | rgb+111 | +white   |         |
 
-
-## TEXT EFFECTS 
+ 
+## EFFECTS 
 
 |           |   |   |    |           |        |
 |-----------|---|---|----|-----------|--------|
-|     reset | 0 | n |    | clear     | reset  |
+|     reset | 0 |   |    | clear     | reset  |
 |      bold | 1 | b |    | bold      |        |
 |     faint | 2 | f |    | faint     |        |
 |       dim | 2 | d |    | dim       |        |

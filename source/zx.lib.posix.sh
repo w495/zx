@@ -52,14 +52,19 @@ _zx__usage() {
   _zx -tr '### POSITIONAL FORM'
   _zx
   _zx -en '\t'
-  _zx "zx -p m!Y!u 'magenta underlined text on a yellow'"
+  _zx "zx -p m/Y/ur 'magenta underlined text on a yellow'"
   _zx -en '\t'
-  _zx -p m!Y!u  'magenta underlined text on a yellow'
+  _zx -p m/Y/ur  'magenta underlined text on a yellow'
   _zx
   _zx -en '\t'
-  _zx "zx -p magenta/YELLOW/underline 'magenta underlined text on a yellow'"
+  _zx "zx -p magenta/Yellow/underline 'magenta underlined text on a yellow'"
   _zx -en '\t'
-  _zx -p magenta/YELLOW/underline  'magenta underlined text on a yellow'
+  _zx -p magenta/Yellow/underline  'magenta underlined text on a yellow'
+  _zx
+  _zx -en '\t'
+  _zx "zx -p yellow/Yellow 'dark yellow text on a bright yellow field'"
+  _zx -en '\t'
+  _zx -p yellow/Yellow  'dark yellow text on a bright yellow field'
   _zx
   _zx -en '\t'
   _zx "zx -pmYru 'magenta underlined text on a yellow field but all reversed'"
@@ -67,12 +72,20 @@ _zx__usage() {
   _zx -pmYru 'magenta underlined text on a yellow field but all reversed'
   _zx
   _zx -en '\t'
-  _zx "zx -anpgex 'ABC '; printf 'DEF '; zx -anpeB 'GHI '; printf 'JKL'; zx -z"
+  _zx "zx -anpg 'green text';"
   _zx -en '\t'
-  _zx -anpgex 'ABC '
-  printf 'DEF '
-  _zx -anpeB 'GHI '
-  printf 'JKL'
+  _zx "printf 'still green text'; "
+  _zx -en '\t'
+  _zx "zx -anpeB 'on blue field '; "
+  _zx -en '\t'
+  _zx "printf 'still on blue field'; "
+  _zx -en '\t'
+  _zx "zx -z"
+  _zx -en '\t'
+  _zx -anpg 'green text '
+  printf 'still green text '
+  _zx -anpeB 'on blue field'
+  printf 'still on blue field'
   _zx -z
 
   _zx
@@ -83,7 +96,8 @@ _zx__usage() {
   _zx -br '| -b? | --bg= | --background= | --background-color= | see COLORS  |'
   _zx -tb '| -t? | --te= |   --emphasis= |      --text-effect= | see EFFECTS |'
   _zx -ti '| -t? | --em= |       --emph= |         --emphasis= |             |'
-  _zx     '| -p* | --ps= |        --pos= |       --positional= | see FORMS   |'
+  _zx     '| -pX | --ps= |        --pos= |       --positional= | see FORMS   |'
+  _zx     '    X=fbt or =f/b/t'
   _zx
   _zx -tr '## VIEW FLAGS'
   _zx -tc '| Ch | Ch | shrt |   word |          long |                        |'
@@ -133,7 +147,7 @@ _zx__usage() {
 
 }
 
-_zx_punct_to_sep() {
+_zx__punct_to_sep() {
    # COMPATIBILITY NOTE:
     # ---------------------------------------------------------------
     #   bash/zsh/ksh93:
@@ -147,7 +161,7 @@ _zx_punct_to_sep() {
     # ---------------------------------------------------------------
 
     # shellcheck disable=SC2001
-    _zx_punct_to_sep__=$(
+    _zx__punct_to_sep_=$(
       echo "${1}" | sed "s/[[:punct:]|[:space:]]/${2}/g"
   )
 }
@@ -156,40 +170,41 @@ _zx_punct_to_sep() {
   _zx__text_effect__code() {
     case $(awk -vi="${1}" 'BEGIN{$0=X;print tolower(i)}') in
       0 | clear | reset)
-        _zx__text_effect__code__=0
+        _zx__text_effect__code_=0
         ;;
       1 | b | bold)
-        _zx__text_effect__code__=1
+        _zx__text_effect__code_=1
         ;;
       2 | d | f | dim | faint)
-        _zx__text_effect__code__=2
+        _zx__text_effect__code_=2
         ;;
       3 | i | italic)
-        _zx__text_effect__code__=3
+        _zx__text_effect__code_=3
         ;;
       4 | u | underline)
-        _zx__text_effect__code__=4
+        _zx__text_effect__code_=4
         ;;
       5 | l | blink)
-        _zx__text_effect__code__=5
+        _zx__text_effect__code_=5
         ;;
       7 | r | reverse)
-        _zx__text_effect__code__=7
+        _zx__text_effect__code_=7
         ;;
       8 | c | conceal)
-        _zx__text_effect__code__=8
+        _zx__text_effect__code_=8
         ;;
       9 | s | x | strike* | del)
-        _zx__text_effect__code__=9
+        _zx__text_effect__code_=9
         ;;
-      '' | e | empty )
-        _zx__text_effect__code__=-1
+      '' | e | empty)
+        _zx__text_effect__code_=-1
         ;;
       *)
-        _zx__text_effect__code__=-2
+        _zx__text_effect__code_=-2
         ;;
     esac
   }
+
   _zx__text_effect__code_seq() {
     te_name_seq="${1}"
     te_sep="${2:-${__ZX__FMT_SEP}}"
@@ -207,20 +222,20 @@ _zx_punct_to_sep() {
     #     std_arg=$(awk -vv="${arg}" -vs="${te_sep}" "${awk_prog}")
     # ---------------------------------------------------------------
 
-    _zx_punct_to_sep "${te_name_seq}" "${te_sep}"
-    te_name_seq="${_zx_punct_to_sep__}"
+    _zx__punct_to_sep "${te_name_seq}" "${te_sep}"
+    te_name_seq="${_zx__punct_to_sep_}"
 
     te_name_seq="${te_name_seq}${te_sep}"
     while test "${te_name_seq#*"${te_sep}"}" != "${te_name_seq}"; do
       te_name="${te_name_seq%%"${te_sep}"*}"
       if test -n "${te_name}"; then
         _zx__text_effect__code "${te_name}"
-        if test "${_zx__text_effect__code__}" -gt 0; then
+        if test "${_zx__text_effect__code_}" -gt 0; then
           if test -n "${te_code_seq}"; then
             te_code_seq="${te_code_seq}${te_sep}"
           fi
-          te_code_seq="${te_code_seq}${_zx__text_effect__code__}"
-        elif test "${_zx__text_effect__code__}" -eq -2; then
+          te_code_seq="${te_code_seq}${_zx__text_effect__code_}"
+        elif test "${_zx__text_effect__code_}" -eq -2; then
           if test ${#te_name} -gt 1; then
             may_be_te_name_seq=$(
               echo "${te_name}" | sed "s/./&${te_sep}/g"
@@ -231,15 +246,15 @@ _zx_punct_to_sep() {
       fi
       te_name_seq="${te_name_seq#*"${te_sep}"}"
     done
-    _zx__text_effect__code_seq__="${te_code_seq}"
+    _zx__text_effect__code_seq_="${te_code_seq}"
 
-    unset -v _zx__text_effect__code__
-    unset -v _zx_punct_to_sep__
-    unset -v te_name_seq
-    unset -v te_sep
-    unset -v te_code_seq
-    unset -v te_name
-    unset -v may_be_te_name_seq
+    _zx__gc _zx__text_effect__code_
+    _zx__gc _zx__punct_to_sep_
+    _zx__gc te_name_seq
+    _zx__gc te_sep
+    _zx__gc te_code_seq
+    _zx__gc te_name
+    _zx__gc may_be_te_name_seq
   }
 }
 
@@ -247,170 +262,173 @@ _zx_punct_to_sep() {
   _zx__color__code_case() {
     case ${1} in
       [[:lower:]]*)
-        _zx__color__code_case__="-${1}"
+        _zx__color__code_case_="-${1}"
         ;;
       [[:upper:]]*)
-        _zx__color__code_case__="+${1}"
+        _zx__color__code_case_="+${1}"
         ;;
       *)
-        _zx__color__code_case__="${1}"
+        _zx__color__code_case_="${1}"
         ;;
     esac
   }
 
   _zx__color__rename() {
-    colors="cyan|magenta|yellow|black|red|green|blue|white"
-    colors="${colors}|c|m|y|k|r|g|b|w"
-    patten="
-      s/^((d|dark|ba|basic)(\W|_)?)(${colors})$/-\4/gi;
-      s/^((i|l|light|br|bright)(\W|_)?)(${colors})?$/+\4/gi;
-      s/^(${colors})((\W|_)?(\-|d|dark|ba|basic))$/-\1/gi;
-      s/^(${colors})((\W|_)?(\+|i|l|light|b|br|bright))$/+\1/gi;
+    _zx__colors_="cyan|magenta|yellow|black|red|green|blue|white"
+    _zx__colors_="${_zx__colors_}|c|m|y|k|r|g|b|w"
+    _zx__patten_="
+      s/^((d|dark|ba|basic)(\W|_)?)(${_zx__colors_})$/-\4/gi;
+      s/^((i|l|light|br|bright)(\W|_)?)(${_zx__colors_})?$/+\4/gi;
+      s/^(${_zx__colors_})((\W|_)?(\-|d|dark|ba|basic))$/-\1/gi;
+      s/^(${_zx__colors_})((\W|_)?(\+|i|l|light|b|br|bright))$/+\1/gi;
       "
-    _zx__color__rename__=$(
-      echo "${1}" | sed -re "${patten}"
+    _zx__color__rename_=$(
+      echo "${1}" | sed -re "${_zx__patten_}"
     )
-    unset -v colors
-    unset -v patten
+    _zx__gc _zx__colors_
+    _zx__gc _zx__patten_
   }
 
   _zx__color__std_name() {
-    color=$(awk -vi="${1}" 'BEGIN{$0=X;print tolower(i)}')
-    _zx__color__rename "${color}"
-    case "${_zx__color__rename__}" in
+    # shellcheck disable=SC2312
+    _zx__color__rename "$(awk -vi="${1}" 'BEGIN{$0=X;print tolower(i)}')"
+    case "${_zx__color__rename_}" in
       -k | k | -0 | 0 | 30 | 40 | rgb-000 | -black | black)
-        _zx__color__std_name__='basic black'
+        _zx__color__std_name_='basic black'
         ;;
       -r | r | -1 | 1 | 31 | 41 | rgb-100 | -red | red)
-        _zx__color__std_name__='basic red'
+        _zx__color__std_name_='basic red'
         ;;
       -g | g | -2 | 2 | 32 | 42 | rgb-010 | -green | green)
-        _zx__color__std_name__='basic green'
+        _zx__color__std_name_='basic green'
         ;;
       -y | y | -3 | 3 | 33 | 43 | rgb-110 | -yellow | yellow)
-        _zx__color__std_name__='basic yellow'
+        _zx__color__std_name_='basic yellow'
         ;;
       -b | b | -4 | 4 | 34 | 44 | rgb-001 | -blue | blue)
-        _zx__color__std_name__='basic blue'
+        _zx__color__std_name_='basic blue'
         ;;
       -m | m | -5 | 5 | 35 | 45 | rgb-101 | -magenta | magenta)
-        _zx__color__std_name__='basic magenta'
+        _zx__color__std_name_='basic magenta'
         ;;
       -c | c | -6 | 6 | 36 | 46 | rgb-011 | -cyan | cyan)
-        _zx__color__std_name__='basic cyan'
+        _zx__color__std_name_='basic cyan'
         ;;
       -w | w | -7 | 7 | 37 | 47 | rgb-111 | -white | white)
-        _zx__color__std_name__='basic white'
+        _zx__color__std_name_='basic white'
         ;;
       ## bright colors
       +k | +0 | 90 | 100 | rgb+000 | +black | gray)
-        _zx__color__std_name__='bright black'
+        _zx__color__std_name_='bright black'
         ;;
       +r | +1 | 91 | 101 | rgb+100 | +red)
-        _zx__color__std_name__='bright red'
+        _zx__color__std_name_='bright red'
         ;;
       +g | +2 | 92 | 102 | rgb+010 | +green)
-        _zx__color__std_name__='bright green'
+        _zx__color__std_name_='bright green'
         ;;
       +y | +3 | 93 | 103 | rgb+110 | +yellow)
-        _zx__color__std_name__='bright yellow'
+        _zx__color__std_name_='bright yellow'
         ;;
       +b | +4 | 94 | 104 | rgb+001 | +blue)
-        _zx__color__std_name__='bright blue'
+        _zx__color__std_name_='bright blue'
         ;;
       +m | +5 | 95 | 105 | rgb+101 | +magenta)
-        _zx__color__std_name__='bright magenta'
+        _zx__color__std_name_='bright magenta'
         ;;
       +c | +6 | 96 | 106 | rgb+011 | +cyan)
-        _zx__color__std_name__='bright cyan'
+        _zx__color__std_name_='bright cyan'
         ;;
       +w | +7 | 97 | 107 | rgb+111 | +white)
-        _zx__color__std_name__='bright white'
+        _zx__color__std_name_='bright white'
         ;;
-      '' | [+-]e | e | [+-]empty | empty )
-        _zx__color__std_name__='empty color'
+      '' | [[:punct:]]* | e | empty)
+        _zx__color__std_name_='empty color'
         ;;
       *)
-        printf >&2 "\e[31mError unknown color '%s' \e[0m\n" "${color}"
-        _zx__color__std_name__='unknown color'
+        ( # use subshell
+          _zx -n -fr -by -cauto "Error:"
+          _zx -n -fr -cauto " unknown color ${1}"
+          _zx
+        ) >&2
+        _zx__color__std_name_='unknown color'
         ;;
     esac
-    unset -v color
-    unset -v _zx__color__rename__
+    _zx__gc _zx__color__rename_
   }
 
   _zx__color__code_pair() {
     case "${1}" in
       'basic black')
-        _zx__color__code_pair__='30 40'
+        _zx__color__code_pair_='30 40'
         ;;
       'basic red')
-        _zx__color__code_pair__='31 41'
+        _zx__color__code_pair_='31 41'
         ;;
       'basic green')
-        _zx__color__code_pair__='32 42'
+        _zx__color__code_pair_='32 42'
         ;;
       'basic yellow')
-        _zx__color__code_pair__='33 43'
+        _zx__color__code_pair_='33 43'
         ;;
       'basic blue')
-        _zx__color__code_pair__='34 44'
+        _zx__color__code_pair_='34 44'
         ;;
       'basic magenta')
-        _zx__color__code_pair__='35 45'
+        _zx__color__code_pair_='35 45'
         ;;
       'basic cyan')
-        _zx__color__code_pair__='36 46'
+        _zx__color__code_pair_='36 46'
         ;;
       'basic white')
-        _zx__color__code_pair__='37 47'
+        _zx__color__code_pair_='37 47'
         ;;
       'bright black')
-        _zx__color__code_pair__='90 100'
+        _zx__color__code_pair_='90 100'
         ;;
       'bright red')
-        _zx__color__code_pair__='91 101'
+        _zx__color__code_pair_='91 101'
         ;;
       'bright green')
-        _zx__color__code_pair__='92 102'
+        _zx__color__code_pair_='92 102'
         ;;
       'bright yellow')
-        _zx__color__code_pair__='93 103'
+        _zx__color__code_pair_='93 103'
         ;;
       'bright blue')
-        _zx__color__code_pair__='94 104'
+        _zx__color__code_pair_='94 104'
         ;;
       'bright magenta')
-        _zx__color__code_pair__='95 105'
+        _zx__color__code_pair_='95 105'
         ;;
       'bright cyan')
-        _zx__color__code_pair__='96 106'
+        _zx__color__code_pair_='96 106'
         ;;
       'bright white')
-        _zx__color__code_pair__='97 107'
+        _zx__color__code_pair_='97 107'
         ;;
       'empty color')
-        _zx__color__code_pair__='-1 -1'
+        _zx__color__code_pair_='-1 -1'
         ;;
       'unknown color')
-        _zx__color__code_pair__='-2 -2'
+        _zx__color__code_pair_='-2 -2'
         ;;
       *)
-        _zx__color__code_pair__='-3 -3'
+        _zx__color__code_pair_='-3 -3'
         ;;
     esac
   }
 
   _zx__color__fg_code() {
     _zx__color__code_pair "${1}"
-    _zx__color__fg_code__="${_zx__color__code_pair__%\ *}"
-    unset -v _zx__color__code_pair__
+    _zx__color__fg_code_="${_zx__color__code_pair_%\ *}"
+    _zx__gc _zx__color__code_pair_
   }
 
   _zx__color__bg_code() {
     _zx__color__code_pair "${1}"
-    _zx__color__bg_code__="${_zx__color__code_pair__#*\ }"
-    unset -v _zx__color__code_pair__
+    _zx__color__bg_code_="${_zx__color__code_pair_#*\ }"
+    _zx__gc _zx__color__code_pair_
   }
 }
 
@@ -433,7 +451,8 @@ _zx__join_code_seq() {
     fi
     code_seq="${code_seq#*"${fmt_sep}"}"
   done
-  _zx__join_code_seq="${code_str}"
+  _zx__join_code_seq_="${code_str}"
+  _zx__gc code_seq fmt_sep ansi_sep code_str code
 }
 
 _zx__code_str() {
@@ -445,48 +464,64 @@ _zx__code_str() {
 
   if test -n "${fg_name}"; then
     _zx__color__std_name "${fg_name}"
-    _zx__color__fg_code "${_zx__color__std_name__}"
-    code_seq="${_zx__color__fg_code__}"
+    _zx__color__fg_code "${_zx__color__std_name_}"
+    code_seq="${_zx__color__fg_code_}"
   fi
   if test -n "${bg_name}"; then
     _zx__color__std_name "${bg_name}"
-    _zx__color__bg_code "${_zx__color__std_name__}"
-    code_seq="${code_seq}${fmt_sep}${_zx__color__bg_code__}"
+    _zx__color__bg_code "${_zx__color__std_name_}"
+    code_seq="${code_seq}${fmt_sep}${_zx__color__bg_code_}"
   fi
   if test -n "${te_name_seq}"; then
     _zx__text_effect__code_seq "${te_name_seq}" "${fmt_sep}"
-    code_seq="${code_seq}${fmt_sep}${_zx__text_effect__code_seq__}"
+    code_seq="${code_seq}${fmt_sep}${_zx__text_effect__code_seq_}"
   fi
   _zx__join_code_seq "${code_seq}" "${fmt_sep}" "${ansi_sep}"
-  _zx__code_str__="${_zx__join_code_seq}"
+  _zx__code_str_="${_zx__join_code_seq_}"
+
+  _zx__gc fg_name bg_name te_name_seq fmt_sep ansi_sep
+
+  _zx__gc _zx__color__std_name_
+  _zx__gc _zx__color__fg_code_
+  _zx__gc _zx__color__bg_code_
+  _zx__gc _zx__text_effect__code_seq_
+  _zx__gc _zx__join_code_seq_
 }
 
 _zx__out() {
   format_name="${1}"
   data="${2}"
 
+  _zx__out_="${data}"
+
   case "${1}" in
     *WRAPPED*)
-      data="\0001${data}\0002"
+      _zx__out_="\0001${_zx__out_}\0002"
       # \[ = \1 = \x01 = \0001, do not use \001! Octal format is \0nnn.
       # \] = \2 = \x02 = \0002, do not use \002! Octal format is \0nnn.
       ;;
     *) ;;
-
   esac
+
   case "${format_name}" in
+    *STRING*)
+      # do nothing
+      ;;
+    *DEBUG*)
+      printf '%s' "${_zx__out_}"
+      ;;
     *ESCAPED*)
-      printf '%b' "${data}"
+      printf '%b' "${_zx__out_}"
       ;;
     *PRINTABLE*)
-      printf '%s' "${data}"
+      printf '%s' "${_zx__out_}"
       ;;
     *)
-      printf '%s' "${data}"
+      # do nothing
       ;;
   esac
-      unset -v format_name
-  unset -v data
+
+  _zx__gc format_name data
 }
 
 _zx__head() {
@@ -499,7 +534,11 @@ _zx__head() {
   #   ksh93:
   #     ESC = \0033
   # ---------------------------------------------------------------
-  _zx__head__="\0033[${_zx__code_str__}m"
+  _zx__head_=''
+  if test -n "${_zx__code_str_}"; then
+    _zx__head_="\0033[${_zx__code_str_}m"
+  fi
+  _zx__gc _zx__code_str_
 }
 
 _zx__tail() {
@@ -512,15 +551,20 @@ _zx__tail() {
   #     ESC = \0033
   # ---------------------------------------------------------------
 
-  _zx__tail__="\0033[${_zx__text_effect__code__}m"
+  _zx__tail_=''
+  if test -n "${_zx__text_effect__code_}"; then
+    _zx__tail_="\0033[${_zx__text_effect__code_}m"
+  fi
+  _zx__gc _zx__text_effect__code_
 }
 
 _zx__pos() {
   arg="${1}"
   te_sep="${2:-${__ZX__FMT_SEP}}"
   pos_sep="${3}"
+  LONG_POS_MARKER='[-+/!:=\ ]'
   case "${arg}" in
-    *[[:punct:]]* | [[:punct:]]* | *[[:punct:]])
+     *${LONG_POS_MARKER}*)
       local_sep="${te_sep}"
       # COMPATIBILITY NOTE:
       # ---------------------------------------------------------
@@ -534,13 +578,20 @@ _zx__pos() {
       # ---------------------------------------------------------
       # shellcheck disable=SC2001
       arg=$(
-        echo "${arg}" | sed "s/[[:punct:]|[:space:]]/${local_sep}/g"
+        echo "${arg}/" | sed -E "s/${LONG_POS_MARKER}+/${local_sep}/g"
       )
-      fg_name="${arg%%"${local_sep}"*}"
-      arg="${arg#*"${local_sep}"}"
-      bg_name="${arg%%"${local_sep}"*}"
-      arg="${arg#*"${local_sep}"}"
-      te_name_seq="${arg}"
+      if test "${arg#*"${local_sep}"}" != "${arg}"; then
+        fg_name="${arg%%"${local_sep}"*}"
+        arg="${arg#*"${local_sep}"}"
+      fi
+      if test "${arg#*"${local_sep}"}" != "${arg}"; then
+        bg_name="${arg%%"${local_sep}"*}"
+        arg="${arg#*"${local_sep}"}"
+      fi
+      if test "${arg#*"${local_sep}"}" != "${arg}"; then
+        te_name_seq="${arg}"
+      fi
+      _zx__gc local_sep
       ;;
     *)
       # COMPATIBILITY NOTE:
@@ -566,19 +617,23 @@ _zx__pos() {
       te_name_seq=$(echo "${te_name_seq}" | sed "s/./&${te_sep}/g")
       ;;
   esac
+  _zx__gc arg te_sep LONG_POS_MARKER
+
   _zx__color__code_case "${fg_name}"
-  _zx__pos__fg_name="${_zx__color__code_case__}"
+  _zx__pos__fg_name_="${_zx__color__code_case_}"
   _zx__color__code_case "${bg_name}"
-  _zx__pos__bg_name="${_zx__color__code_case__}"
-  _zx__pos__te_name_seq="${te_name_seq}"
+  _zx__pos__bg_name_="${_zx__color__code_case_}"
+  _zx__pos__te_name_seq_="${te_name_seq}"
+  _zx__gc _zx__color__code_case_
 
   if test -n "${pos_sep}"; then
-    _zx__pos__="${fg_name}${pos_sep}${bg_name}${pos_sep}${te_name_seq}"
+    _zx__pos_="${fg_name}${pos_sep}${bg_name}${pos_sep}${te_name_seq}"
   fi
+  _zx__gc  fg_name bg_name te_name_seq pos_sep
 }
 
 _zx__getopt() {
- nm='_zx'
+  nm='_zx'
   so='' # — short opt_seq
   ## MAIN SHORT opt_seq
   so="${so}f:" # — foreground
@@ -590,12 +645,13 @@ _zx__getopt() {
   so="${so}aH" # — head only
   so="${so}zT" # — tail only
   so="${so}wP" # — prompt wrap
+  so="${so}s"  # — do not output anything; sets _zx-string
 
   ## ECHO COMPATIBILITY SHORT opt_seq:
   so="${so}n"  # — do not output the trailing newline.
   so="${so}e"  # — enable escapes interpretation for opt_text.
   so="${so}E"  # — disable escapes interpretation for opt_text.
-  so="${so}D"  # — disable escapes interpretation for all.
+  so="${so}Dd"  # — disable escapes interpretation for all.
 
   ## COREUTILS COMPATIBILITY SHORT opt_seq:
   so="${so}c::a"
@@ -607,14 +663,15 @@ _zx__getopt() {
   # MAIN LONG opt_seq
   lo="${lo}fg:,foreground:,foreground-color:,"
   lo="${lo}bg:,background:,background-color:,"
-  lo="${lo}te:,opt_text-effect:,em:,emphasis:,"
+  lo="${lo}te:,text-effect:,em:,emphasis:,"
   lo="${lo}ps:,pos:,positional:,"
   lo="${lo}help,"
   lo="${lo}version,"
 
   lo="${lo}ho,head-only," # — head only
   lo="${lo}to,tail-only," # — tail only
-  lo="${lo}pw,wrap,prompt-wrap"      # — prompt wrap
+  lo="${lo}pw,wrap,prompt-wrap,"      # — prompt wrap
+  lo="${lo}str,string,"  # — do not output anything; sets _zx-string
 
   ## ECHO COMPATIBILITY LONG opt_seq:
   lo="${lo}nn,no-newline,"
@@ -631,14 +688,13 @@ _zx__getopt() {
   # --auto and --auto-color means --color='auto'.
 
   getopt -n "${nm}" -o "${so}" -l "${lo}" -- "${@}"
-  unset nm so lo
+  _zx__gc nm so lo
 }
 
 _zx__configure() {
-  opt=$(_zx__getopt "${@}")
-  eval set -- "${opt}"
-  unset opt
-
+  _zx__configure__options_=$(_zx__getopt "${@}")
+  eval set -- "${_zx__configure__options_}"
+  _zx__configure__status_=''
   while test $# -gt 0; do
     case ${1} in
       # MAIN opt_seq
@@ -650,7 +706,7 @@ _zx__configure() {
         opt_bg_name="${2}"
         shift 2
         ;;
-      -t | --te | --opt_text-effect | --em | --emph | --emphasis)
+      -t | --te | --text-effect | --em | --emph | --emphasis)
         opt_te_name_seq="${opt_te_name_seq} ${2}"
         shift 2
         ;;
@@ -659,12 +715,12 @@ _zx__configure() {
         shift 2
         ;;
       -h | --help)
-        _zx__usage
-        shift 1
+        _zx__configure__status_='HELP'
+        return 0
         ;;
       -v | --version)
-        printf '0.1769981220'
-        shift 1
+        _zx__configure__status_='VERSION'
+        return 0
         ;;
       -a | -H | --ho | --head | --head-only)
         opt_use_head=true
@@ -686,19 +742,25 @@ _zx__configure() {
         opt_use_newline=false
         shift 1
         ;;
+      -s | --str | --string)
+        opt_txt_format="${opt_txt_format}+STRING"
+        opt_esc_format="${opt_esc_format}+STRING"
+        opt_nln_format="${opt_txt_format}+STRING"
+        shift 1
+        ;;
       -e | --esc | --escapes)
         # Echo compatibility.
-        opt_txt_format='ESCAPED'
+        opt_txt_format="${opt_txt_format}+ESCAPED"
         shift 1
         ;;
       -E | --ne | --nesc | --no-esc | --no-escapes)
         # Echo compatibility.
-        opt_txt_format='PRINTABLE'
+        opt_txt_format="${opt_txt_format}+PRINTABLE"
         shift 1
         ;;
       -D | --debug)
         # Echo compatibility.
-        opt_esc_format='PRINTABLE'
+        opt_esc_format="${opt_esc_format}+DEBUG"
         shift 1
         ;;
       # COREUTILS COMPATIBILITY
@@ -726,12 +788,14 @@ _zx__configure() {
         break
         ;;
       *)
-        echo "zx unknown parameter '${1}'." >&2
-        shift 1
+        _zx__configure__status_='UNKNOWN_PARAMETER'
+        _zx__configure__unknown_option_="${1}"
+        return 1
         ;;
     esac
   done
   opt_text="${*}"
+  _zx__configure__status_='DONE'
 }
 
 _zx() {
@@ -748,6 +812,7 @@ _zx() {
   opt_when_use_color='ALWAYS'
   opt_txt_format='PRINTABLE'
   opt_esc_format='ESCAPED'
+  opt_nln_format='ESCAPED'
 
   opt_use_newline=true
   opt_use_head=true
@@ -755,11 +820,43 @@ _zx() {
 
   _zx__configure "$@"
 
+  case "${_zx__configure__status_}" in
+    HELP)
+      _zx__usage
+      return 0
+      ;;
+    VERSION)
+      _zx --text-effect reverse -- '0.1769981220'
+      return 0
+      ;;
+    DONE) ;;
+
+    UNKNOWN_PARAMETER)
+      _zx >&2 --foreground +red -- \
+        "zx: Unknown options: ${_zx__configure__unknown_option_};" \
+        "with options ${_zx__configure__options_}"
+      return 1
+      ;;
+    *)
+      _zx >&2 --foreground +red --background +yellow -- \
+        "zx: Unknown error" \
+        "with options ${_zx__configure__options_}"
+      return 1
+      ;;
+  esac
+  _zx__gc _zx__configure__status_
+  _zx__gc _zx__configure__options_
+
   if test -n "${opt_pos_args_seq}"; then
     _zx__pos "${opt_pos_args_seq}" "${__ZX__FMT_SEP}"
-    opt_fg_name="${_zx__pos__fg_name}"
-    opt_bg_name="${_zx__pos__bg_name}"
-    opt_te_name_seq="${_zx__pos__te_name_seq}"
+    opt_fg_name="${_zx__pos__fg_name_}"
+    opt_bg_name="${_zx__pos__bg_name_}"
+    opt_te_name_seq="${_zx__pos__te_name_seq_}"
+
+    _zx__gc _zx__pos_
+    _zx__gc _zx__pos__fg_name_
+    _zx__gc _zx__pos__bg_name_
+    _zx__gc _zx__pos__te_name_seq_
   fi
 
   # COREUTILS COMPATIBILITY
@@ -786,76 +883,76 @@ _zx() {
       ;;
   esac
 
+  _zx_=''
   if "${use_colors}" && "${opt_use_head}"; then
     _zx__head  "${opt_fg_name}" "${opt_bg_name}" "${opt_te_name_seq}"
-    _zx__out   "${opt_esc_format}" "${_zx__head__}"
+    _zx__out   "${opt_esc_format}" "${_zx__head_}"
+    _zx_="${_zx_}${_zx__out_}"
   fi
   _zx__out "${opt_txt_format}" "${opt_text}"
-  if "${use_colors}" && "${opt_use_tail}"; then
-    _zx__tail  "${opt_fg_name}" "${opt_bg_name}" "${opt_te_name_seq}"
-    _zx__out   "${opt_esc_format}" "${_zx__tail__}"
-  fi
+  _zx_="${_zx_}${_zx__out_}"
+  if "${use_colors}" && "${opt_use_tail}" && ! ( "${opt_use_head}" && test -z "${_zx__head_}" ); then
 
+    # only if _zx__head_ exists
+    _zx__tail  "${opt_fg_name}" "${opt_bg_name}" "${opt_te_name_seq}"
+    _zx__out   "${opt_esc_format}" "${_zx__tail_}"
+    _zx_="${_zx_}${_zx__out_}"
+  fi
   # ECHO COMPATIBILITY
   if "${opt_use_newline}"; then
-    _zx__out ESCAPED '\n'
+    _zx__out "${opt_nln_format}" '\n'
+    _zx_="${_zx_}${_zx__out_}"
   fi
+
+  _zx__gc opt_bg_name opt_fg_name opt_te_name_seq opt_text
+  _zx__gc opt_esc_format opt_nln_format opt_txt_format
+  _zx__gc opt_pos_args_seq
+  _zx__gc opt_use_head opt_use_tail opt_use_newline
+  _zx__gc opt_when_use_color
+  _zx__gc use_colors output_type
+
+  _zx__gc __ZX__ESC_ANSI_SEP __ZX__FMT_SEP __ZX__OUTPUT_STREAM_FD
+
+  _zx__gc _zx__head_
+  _zx__gc _zx__out_
+  _zx__gc _zx__tail_
+
+  _zx__unset_vars
 }
 
-_zx__clean() {
-  unset ansi_sep
-  unset arg
-  unset awk_prog
-  unset opt_bg_name
-  unset cl
-  unset code
-  unset code_seq
-  unset code_str
-  unset color
-  unset disable
-  unset enable
-  unset opt_fg_name
-  unset fmt_sep
-  unset lo
-  unset local_sep
-  unset newline
-  unset nm
-  unset opt_seq
-  unset output_type
-  unset patten
-  unset opt_pos_args_seq
-  unset pos_sep
-  unset result
-  unset std_arg
-  unset stream_name
-  unset te_code_seq
-  unset te_name
-  unset opt_te_name_seq
-  unset te_sep
-  unset opt_text
-  unset use_colors
-  unset use_initial_escapes
-  unset opt_use_newline
-  unset opt_when_use_color
-  unset _zx__apply
-  unset _zx__color__bg_code
-  unset _zx__code_str
-  unset _zx__color__code_case
-  unset _zx__color__code_pair
-  unset _zx__color__std_name
-  unset __ZX__ESC_ANSI_SEP
-  unset _zx__color__fg_code
-  unset __ZX__FMT_SEP
-  unset _zx__head
-  unset _zx__join_code_seq
-  unset __ZX__OUTPUT_STREAM_FD
-  unset __ZX__OUTPUT_STREAM_FD
-  unset _zx__pos
-  unset _zx__pos__bg_name
-  unset _zx__pos__fg_name
-  unset _zx__pos__te_name_seq
-  unset _zx__color__rename
-  unset _zx__tail
-  unset _zx__text_effect__code__
-  unset _zx__text_effect__code_seq
+_zx__gc() {
+  _zx__gc_="${_zx__gc_} ${*}"
+}
+
+_zx__unset_vars() {
+  eval unset -v "${_zx__gc_}"
+}
+
+_zx__unset_functions() {
+  unset -f _zx__usage
+  unset -f _zx__punct_to_sep
+  unset -f _zx__text_effect__code
+  unset -f _zx__text_effect__code_seq
+  unset -f _zx__color__code_case
+  unset -f _zx__color__rename
+  unset -f _zx__color__std_name
+  unset -f _zx__color__code_pair
+  unset -f _zx__color__fg_code
+  unset -f _zx__color__bg_code
+  unset -f _zx__join_code_seq
+  unset -f _zx__code_str
+  unset -f _zx__out
+  unset -f _zx__head
+  unset -f _zx__tail
+  unset -f _zx__pos
+  unset -f _zx__getopt
+  unset -f _zx__configure
+  unset -f _zx__gc_
+}
+
+_zx__unset_functions_all() {
+  _zx__clean
+  unset -f _zx
+  unset -f _zx__unset_functions
+  unset -f _zx__unset_functions_all
 }

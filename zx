@@ -7,8 +7,6 @@ __here_dir=$(dirname "${__here_path}")
 # shellcheck disable=SC1090
 . "${__here_dir}/source/zx.lib.posix.sh"
 
-#set -x
 _zx "${@}"
-#set +x
 
 unset __here_path __here_dir _zx_source
