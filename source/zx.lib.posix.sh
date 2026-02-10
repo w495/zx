@@ -3,13 +3,25 @@
 
 # COMPATIBILITY NOTE:
 # ---------------------------------------------------------------
-#   bash/zsh/ksh93:
+#  bash/zsh/ksh93:
 #     shfmt -ci -i 2 -sr -s -bn -kp -ln bash -d
 #
-#   See compatibility notes below and use posix variants.
-#   How to check posix:
+#  See compatibility notes below and use posix variants.
+#  How to check posix:
 #     shfmt -ci -i 2 -sr -s -bn -kp -ln posix -d
 # ---------------------------------------------------------------
+
+# Runtime flags
+test -z "${ZX_LAZY_UNSET}"    && readonly ZX_LAZY_UNSET=false
+test -z "${ZX_EXEC_GETOPTS}"  && readonly ZX_EXEC_GETOPTS=true
+
+# Internal constants
+test -z "${__ZX__FMT_SEP}"        && readonly __ZX__FMT_SEP='\ '
+test -z "${__ZX__ESC_ANSI_SEP}"   && readonly __ZX__ESC_ANSI_SEP=';'
+
+if test -z "${__ZX_SPACE_PUNCT}"; then
+  __ZX_SPACE_PUNCT='\t\n\v\f\v\ !#$%&\*+,\-\:;<=>?@\[\\\x5D^_\`{|}~'
+fi
 
 _zx__usage() {
   _zx -tr '# ZX'
@@ -17,9 +29,9 @@ _zx__usage() {
   _zx -tr '## USAGE'
   _zx
   _zx -td -fg '```'
-  _zx -ntb     -- '   zx '
-  _zx -ntif    -- '   [OPTIONS] '
-  _zx -nti     -- '   [TEXT]'
+  _zx -ntb     -- '  zx '
+  _zx -ntif    -- '  [OPTIONS] '
+  _zx -nti     -- '  [TEXT]'
   _zx
   _zx -td -fg '```'
   _zx
@@ -94,28 +106,33 @@ _zx__usage() {
   _zx -tc '|----:|------:|--------------:|--------------------:|-------------|'
   _zx -fr '| -f? | --fg= | --foreground= | --foreground-color= | see COLORS  |'
   _zx -br '| -b? | --bg= | --background= | --background-color= | see COLORS  |'
-  _zx -tb '| -t? | --te= |   --emphasis= |      --text-effect= | see EFFECTS |'
+  _zx -tb '| -t? | --te= |  --emphasis= |      --text-effect= | see EFFECTS |'
   _zx -ti '| -t? | --em= |       --emph= |         --emphasis= |             |'
-  _zx     '| -pX | --ps= |        --pos= |       --positional= | see FORMS   |'
+  _zx     '| -pX | --ps= |        --pos= |       --positional= | see FORMS  |'
   _zx     '    X=fbt or =f/b/t'
   _zx
   _zx -tr '## VIEW FLAGS'
-  _zx -tc '| Ch | Ch | shrt |   word |          long |                        |'
+  _zx -tc '| Ch | Ch | shrt |  word |          long |                        |'
   _zx -tc '|---:|----|------|-------:|--------------:|------------------------|'
-  _zx     '| -a | -H | --ho | --head |   --head-only | starts colourful text  |'
-  _zx     '| -z | -T | --to | --tail |   --tail-only | ends colourful text    |'
+  _zx     '| -a | -H | --ho | --head |  --head-only | starts colourful text  |'
+  _zx     '| -z | -T | --to | --tail |  --tail-only | ends colourful text    |'
   _zx     '| -w | -P | --pw | --wrap | --prompt-wrap | wraps for shell prompt |'
   _zx
   _zx -tr '## COLORS'
   _zx
-  _zx -etc  '|      |\e[0m    |    |         |          |         |'
-  _zx -etd  '|------|\e[0m----|----|---------|----------|---------|'
-  _zx -ef-k '| █▓▒░ |\e[0m -k | -0 | rgb-000 | -black   | black   |'
-  _zx -ef+k '| █▓▒░ |\e[0m +k | +0 | rgb+000 | +black   | gray    |'
-  _zx -ef-r '| █▓▒░ |\e[0m -r | -1 | rgb-100 | -red     | red     |'
-  _zx -ef+r '| █▓▒░ |\e[0m +r | +1 | rgb+100 | +red     |         |'
-  _zx -ef-g '| █▓▒░ |\e[0m -g | -2 | rgb-010 | -green   | green   |'
-  _zx -ef+g '| █▓▒░ |\e[0m +g | +2 | rgb+010 | +green   |         |'
+  _zx -e -tc   '|      |\e[0m    |    |         |          |         |'
+  _zx -e -td '|------|\e[0m----|----|---------|----------|---------|\n|'
+  _zx -nf-k ' █▓▒░ '
+  _zx -ne   '| -k | -0 | rgb-000 | -black  | black   |\n|'
+  _zx -nf-k ' █▓▒░ '
+  _zx -ne   '| +k | +0 | rgb+000 | +black  | gray    |\n|'
+  _zx -nf-r ' █▓▒░ '
+  _zx -ne   '| -r | -1 | rgb-100 | -red    | red     |\n|'
+  _zx -nf+r ' █▓▒░ '
+  _zx -ne   '| +r | +1 | rgb+100 | +red    |         |\n|'
+
+  _zx -ef-g '| █▓▒░ |\e[0m -g | -2 | rgb-010 | -green  | green  |'
+  _zx -ef+g '| █▓▒░ |\e[0m +g | +2 | rgb+010 | +green  |         |'
   _zx -ef-y '| █▓▒░ |\e[0m -y | -3 | rgb-110 | -yellow  | yellow  |'
   _zx -ef+y '| █▓▒░ |\e[0m +y | +3 | rgb+110 | +yellow  |         |'
   _zx -ef-b '| █▓▒░ |\e[0m -b | -4 | rgb-001 | -blue    | blue    |'
@@ -124,15 +141,15 @@ _zx__usage() {
   _zx -ef+m '| █▓▒░ |\e[0m +m | +5 | rgb+101 | +magenta |         |'
   _zx -ef-c '| █▓▒░ |\e[0m -c | -6 | rgb-011 | -cyan    | cyan    |'
   _zx -ef+c '| █▓▒░ |\e[0m +c | +6 | rgb+011 | +cyan    |         |'
-  _zx -ef-w '| █▓▒░ |\e[0m -w | -7 | rgb-111 | -white   | white   |'
-  _zx -ef+w '| █▓▒░ |\e[0m +w | +7 | rgb+111 | +white   |         |'
+  _zx -ef-w '| █▓▒░ |\e[0m -w | -7 | rgb-111 | -white  | white  |'
+  _zx -ef+w '| █▓▒░ |\e[0m +w | +7 | rgb+111 | +white  |         |'
   _zx
   _zx
   _zx -tr '## EFFECTS '
   _zx
-  _zx -etc '|           |\e[0m   |   |    |           |        |'
+  _zx -etc '|           |\e[0m  |  |    |           |        |'
   _zx -etd '|-----------|\e[0m---|---|----|-----------|--------|'
-  _zx -et0 '|     reset |\e[0m 0 |   |    | clear     | reset  |'
+  _zx -et0 '|     reset |\e[0m 0 |  |    | clear     | reset  |'
   _zx -etb '|      bold |\e[0m 1 | b |    | bold      |        |'
   _zx -etf '|     faint |\e[0m 2 | f |    | faint     |        |'
   _zx -etd '|       dim |\e[0m 2 | d |    | dim       |        |'
@@ -140,35 +157,72 @@ _zx__usage() {
   _zx -eti '|  emphasis |\e[0m 3 | e | em | emphasis  |        |'
   _zx -etu '| underline |\e[0m 4 | u | un | underline |        |'
   _zx -etl '|     blink |\e[0m 5 | l |    | blink     |        |'
-  _zx -etr '|   reverse |\e[0m 7 | r | re | reverse   |        |'
-  _zx -etc '|   conceal |\e[0m 8 | c | co | conceal   |        |'
+  _zx -etr '|  reverse |\e[0m 7 | r | re | reverse  |        |'
+  _zx -etc '|  conceal |\e[0m 8 | c | co | conceal  |        |'
   _zx -etx '| strikeout |\e[0m 9 | x | s  | strike    | del    |'
   _zx
 
 }
 
+
+_zx__punct_to_sep__native() {
+
+  data="${1}"
+  punct="${2}"  # [[:punct:]] or [[:punct:]|[:space:]]
+  sep="${3}"
+
+  punct_suffix="${punct}*"
+  punct_prefix="*${punct}"
+
+  _zx__replace_=''
+
+  # shellcheck disable=SC2295
+  while test "${data#${punct_prefix}}" != "${data}"; do
+    # shellcheck disable=SC2295
+    item="${data%%${punct_suffix}}"
+    #  Example: 'a/b:cd' --> 'a'
+    #     'a/b:cd' but without longest suffix '/b:cd'
+    if test -n "${item}"; then
+      # Handle case with empty item. E.g.: '::x:y'
+      if test -n "${_zx__replace_}"; then
+        # If not empty — append separator.
+        _zx__replace_="${_zx__replace_}${sep}"
+      fi
+      _zx__replace_="${_zx__replace_}${item}"
+    fi
+    # shellcheck disable=SC2295
+    te_name_seq="${data#${punct_prefix}}"
+  done
+}
+
 _zx__punct_to_sep() {
-   # COMPATIBILITY NOTE:
+  data="${1}"
+  punct="${2}"  # [[:punct:]] or [[:punct:]|[:space:]]
+  sep="${3}"
+
+  # COMPATIBILITY NOTE:
     # ---------------------------------------------------------------
-    #   bash/zsh/ksh93:
-    #     res="${1//[[:punct:]]/${2}}"
-    #   posix:
-    #     # shellcheck disable=SC2001
-    #     res=$(echo "${1}" | sed "s/[[:punct:]]/${2}/")
+    #  bash/zsh/ksh93:
+    #     res="${data//${punct}/${sep}}"
+    #  posix:
+    #     res=$(echo "${data}" | sed "s/${punct}+/${sep}/")
     #     OR
     #     awk_prog='BEGIN{$0=v;gsub(/[[:punct:]]/,s);print}'
-    #     res=$(awk -vv="${1}" -vs="${2}" "${awk_prog}")
+    #     res=$(awk -vv="${data}" -vs="${sep}" "${awk_prog}")
+    #     OR
     # ---------------------------------------------------------------
 
-    # shellcheck disable=SC2001
     _zx__punct_to_sep_=$(
-      echo "${1}" | sed "s/[[:punct:]|[:space:]]/${2}/g"
-  )
+      echo "${data}${sep}" | sed "s/${punct}+/${sep}/g"
+      # Append separator to the end to handle
+      # the last value as the others.
+    )
+
 }
 
 { # _zx__text_effect__*
   _zx__text_effect__code() {
-    case $(awk -vi="${1}" 'BEGIN{$0=X;print tolower(i)}') in
+    case $(awk -v "i=${1}" 'BEGIN{$0=X;print tolower(i)}') in
       0 | clear | reset)
         _zx__text_effect__code_=0
         ;;
@@ -207,36 +261,47 @@ _zx__punct_to_sep() {
 
   _zx__text_effect__code_seq() {
     te_name_seq="${1}"
+    #           Example: 'b:i:ru'.
+
     te_sep="${2:-${__ZX__FMT_SEP}}"
     te_code_seq=''
 
-    # COMPATIBILITY NOTE:
-    # ---------------------------------------------------------------
-    #   bash/zsh/ksh93:
-    #     std_arg="${arg//[[:punct:]]/${te_sep}}"
-    #   posix:
-    #     # shellcheck disable=SC2001
-    #     std_arg=$(echo "${arg}" | sed "s/[[:punct:]]/${te_sep}/")
-    #     OR
-    #     awk_prog='BEGIN{$0=v;gsub(/[[:punct:]]/,s);print}'
-    #     std_arg=$(awk -vv="${arg}" -vs="${te_sep}" "${awk_prog}")
-    # ---------------------------------------------------------------
-
     _zx__punct_to_sep "${te_name_seq}" "${te_sep}"
-    te_name_seq="${_zx__punct_to_sep_}"
+    #           Example: 'b/i/ru'.
 
-    te_name_seq="${te_name_seq}${te_sep}"
-    while test "${te_name_seq#*"${te_sep}"}" != "${te_name_seq}"; do
-      te_name="${te_name_seq%%"${te_sep}"*}"
+    te_name_seq="${_zx__punct_to_sep_}"
+    #           Example: 'b:i:ru:'.
+
+    te_sep_suffix="[${__ZX_SPACE_PUNCT}]*"
+    te_sep_prefix="*[${__ZX_SPACE_PUNCT}]"
+
+    # shellcheck disable=SC2295
+    while test "${te_name_seq#${te_sep_prefix}}" != "${te_name_seq}"; do
+      #         Example: 1  'i:ru:' != 'b:i:ru:'
+      #                  2    'ru:' != 'i:ru:'
+      #                  3       '' != 'ru:'
+      #                  4        '' == '', so stop iterations.
+
+      # shellcheck disable=SC2295
+      te_name="${te_name_seq%%${te_sep_suffix}}"
+      #         Example: 'b:i:ru' --> 'b'
+      #                  'b:i:ru' but without longest suffix ':i:ru'
+
       if test -n "${te_name}"; then
         _zx__text_effect__code "${te_name}"
+        # Get code.
+        #       Example: 'b' --> '1'.
         if test "${_zx__text_effect__code_}" -gt 0; then
           if test -n "${te_code_seq}"; then
+            # If not empty — append separator.
             te_code_seq="${te_code_seq}${te_sep}"
           fi
           te_code_seq="${te_code_seq}${_zx__text_effect__code_}"
         elif test "${_zx__text_effect__code_}" -eq -2; then
           if test ${#te_name} -gt 1; then
+            # The code is unknown and te_name is more than one character.
+            #   Example: te_name='ru'.
+
             may_be_te_name_seq=$(
               echo "${te_name}" | sed "s/./&${te_sep}/g"
             )
@@ -244,17 +309,14 @@ _zx__punct_to_sep() {
           fi
         fi
       fi
-      te_name_seq="${te_name_seq#*"${te_sep}"}"
+      # shellcheck disable=SC2295
+      te_name_seq="${te_name_seq#${te_sep_prefix}}"
     done
     _zx__text_effect__code_seq_="${te_code_seq}"
 
-    _zx__gc _zx__text_effect__code_
-    _zx__gc _zx__punct_to_sep_
-    _zx__gc te_name_seq
-    _zx__gc te_sep
-    _zx__gc te_code_seq
-    _zx__gc te_name
-    _zx__gc may_be_te_name_seq
+    _zx__gc _zx__text_effect__code_ _zx__punct_to_sep_
+    _zx__gc te_sep te_sep_suffix te_sep_prefix
+    _zx__gc te_code_seq te_name te_name_seq may_be_te_name_seq
   }
 }
 
@@ -283,7 +345,7 @@ _zx__punct_to_sep() {
       s/^(${_zx__colors_})((\W|_)?(\+|i|l|light|b|br|bright))$/+\1/gi;
       "
     _zx__color__rename_=$(
-      echo "${1}" | sed -re "${_zx__patten_}"
+      awk -v "i=${1}" 'BEGIN{$0=X;print tolower(i)}' | sed -re "${_zx__patten_}"
     )
     _zx__gc _zx__colors_
     _zx__gc _zx__patten_
@@ -291,7 +353,7 @@ _zx__punct_to_sep() {
 
   _zx__color__std_name() {
     # shellcheck disable=SC2312
-    _zx__color__rename "$(awk -vi="${1}" 'BEGIN{$0=X;print tolower(i)}')"
+    _zx__color__rename "${1}"
     case "${_zx__color__rename_}" in
       -k | k | -0 | 0 | 30 | 40 | rgb-000 | -black | black)
         _zx__color__std_name_='basic black'
@@ -437,10 +499,15 @@ _zx__join_code_seq() {
   fmt_sep="${2:-${__ZX__FMT_SEP}}"
   ansi_sep="${3:-${__ZX__ESC_ANSI_SEP}}"
 
+  fmt_sep_suffix="${fmt_sep}*"
+  fmt_sep_prefix="*${fmt_sep}"
+
   code_str=''
   code_seq="${code_seq}${fmt_sep}"
-  while test "${code_seq#*"${fmt_sep}"}" != "${code_seq}"; do
-    code="${code_seq%%"${fmt_sep}"*}"
+
+  # shellcheck disable=SC2295
+  while test "${code_seq#${fmt_sep_prefix}}" != "${code_seq}"; do
+    code="${code_seq%%${fmt_sep_suffix}}"
     if test -n "${code}"; then
       if test "${code}" -gt 0; then
         if test -n "${code_str}"; then
@@ -449,7 +516,7 @@ _zx__join_code_seq() {
         code_str="${code_str}${code}"
       fi
     fi
-    code_seq="${code_seq#*"${fmt_sep}"}"
+    code_seq="${code_seq#${fmt_sep_prefix}}"
   done
   _zx__join_code_seq_="${code_str}"
   _zx__gc code_seq fmt_sep ansi_sep code_str code
@@ -529,9 +596,9 @@ _zx__head() {
 
   # COMPATIBILITY NOTE:
   # ---------------------------------------------------------------
-  #   bash/zsh:
+  #  bash/zsh:
   #     ESC = \x1b = \e = \E
-  #   ksh93:
+  #  ksh93:
   #     ESC = \0033
   # ---------------------------------------------------------------
   _zx__head_=''
@@ -545,9 +612,9 @@ _zx__tail() {
   _zx__text_effect__code reset
   # COMPATIBILITY NOTE:
   # ---------------------------------------------------------------
-  #   bash/zsh:
+  #  bash/zsh:
   #     ESC = \x1b = \e = \E
-  #   ksh93:
+  #  ksh93:
   #     ESC = \0033
   # ---------------------------------------------------------------
 
@@ -568,9 +635,9 @@ _zx__pos() {
       local_sep="${te_sep}"
       # COMPATIBILITY NOTE:
       # ---------------------------------------------------------
-      #   bash/zsh/ksh93:
+      #  bash/zsh/ksh93:
       #     std_arg="${arg//[[:punct:]]/${local_sep}}"
-      #   posix:
+      #  posix:
       #     # shellcheck disable=SC2001
       #     std_arg=$(echo "${arg}" | sed "s/[[:punct:]]/${local_sep}/g")
       #     OR
@@ -578,17 +645,21 @@ _zx__pos() {
       # ---------------------------------------------------------
       # shellcheck disable=SC2001
       arg=$(
-        echo "${arg}/" | sed -E "s/${LONG_POS_MARKER}+/${local_sep}/g"
+        echo "${arg}${local_sep}" | sed -E "s/${LONG_POS_MARKER}+/${local_sep}/g"
       )
-      if test "${arg#*"${local_sep}"}" != "${arg}"; then
-        fg_name="${arg%%"${local_sep}"*}"
-        arg="${arg#*"${local_sep}"}"
+
+      local_sep_suffix="[${local_sep}]*"
+      local_sep_prefix="*[${local_sep}]"
+
+      if test "${arg#${local_sep_prefix}}" != "${arg}"; then
+        fg_name="${arg%%${local_sep_suffix}}"
+        arg="${arg#${local_sep_prefix}}"
       fi
-      if test "${arg#*"${local_sep}"}" != "${arg}"; then
-        bg_name="${arg%%"${local_sep}"*}"
-        arg="${arg#*"${local_sep}"}"
+      if test "${arg#${local_sep_prefix}}" != "${arg}"; then
+        bg_name="${arg%%${local_sep_prefix}}"
+        arg="${arg#${local_sep_prefix}}"
       fi
-      if test "${arg#*"${local_sep}"}" != "${arg}"; then
+      if test "${arg#${local_sep_prefix}}" != "${arg}"; then
         te_name_seq="${arg}"
       fi
       _zx__gc local_sep
@@ -596,11 +667,11 @@ _zx__pos() {
     *)
       # COMPATIBILITY NOTE:
       # ---------------------------------------------------------
-      #   bash/zsh/ksh93:
+      #  bash/zsh/ksh93:
       #     fg_name="${arg:0:1}"
       #     bg_name="${arg:1:1}"
       #     te_name_seq="${arg:2}"
-      #   posix:
+      #  posix:
       #     fg_name=$(echo "${arg}" | cut -c1)
       #     bg_name=$(echo "${arg}" | cut -c2)
       #     te_name_seq=$(echo "${arg}" | cut -c3-)
@@ -611,9 +682,9 @@ _zx__pos() {
       te_name_seq=$(echo "${arg}" | cut -c3-)
 
       # shellcheck disable=SC2001
-      #   bash==5.1.16
-      #   complex substitution:
-      #   split every char with ${te_sep}
+      #  bash==5.1.16
+      #  complex substitution:
+      #  split every char with ${te_sep}
       te_name_seq=$(echo "${te_name_seq}" | sed "s/./&${te_sep}/g")
       ;;
   esac
@@ -707,7 +778,10 @@ _zx__configure() {
         shift 2
         ;;
       -t | --te | --text-effect | --em | --emph | --emphasis)
-        opt_te_name_seq="${opt_te_name_seq} ${2}"
+        if test -n "${opt_te_name_seq}"; then
+          opt_te_name_seq="${opt_te_name_seq} "
+        fi
+        opt_te_name_seq="${opt_te_name_seq}${2}"
         shift 2
         ;;
       -p | --ps | --pos | positional)
@@ -799,10 +873,6 @@ _zx__configure() {
 }
 
 _zx() {
-  __ZX__OUTPUT_STREAM_FD=1
-  __ZX__FMT_SEP=':'
-  __ZX__ESC_ANSI_SEP=';'
-
   opt_fg_name=''
   opt_bg_name=''
   opt_te_name_seq=''
@@ -860,10 +930,7 @@ _zx() {
   fi
 
   # COREUTILS COMPATIBILITY
-  output_type='FILE'
-  if test -t "${__ZX__OUTPUT_STREAM_FD}"; then
-    output_type='STREAM'
-  fi
+  output_type='FILE' && test -t '1' &&  output_type='STREAM'
 
   case "${opt_when_use_color}_${output_type}" in
     NEVER*)
@@ -882,21 +949,21 @@ _zx() {
       use_colors=true
       ;;
   esac
-
   _zx_=''
   if "${use_colors}" && "${opt_use_head}"; then
     _zx__head  "${opt_fg_name}" "${opt_bg_name}" "${opt_te_name_seq}"
-    _zx__out   "${opt_esc_format}" "${_zx__head_}"
+    _zx__out  "${opt_esc_format}" "${_zx__head_}"
     _zx_="${_zx_}${_zx__out_}"
   fi
   _zx__out "${opt_txt_format}" "${opt_text}"
   _zx_="${_zx_}${_zx__out_}"
-  if "${use_colors}" && "${opt_use_tail}" && ! ( "${opt_use_head}" && test -z "${_zx__head_}" ); then
-
-    # only if _zx__head_ exists
-    _zx__tail  "${opt_fg_name}" "${opt_bg_name}" "${opt_te_name_seq}"
-    _zx__out   "${opt_esc_format}" "${_zx__tail_}"
-    _zx_="${_zx_}${_zx__out_}"
+  if "${use_colors}" && "${opt_use_tail}" ; then
+    if ! "${opt_use_head}" || test -n "${_zx__head_}" ; then
+      # only if _zx__head_ exists
+      _zx__tail  "${opt_fg_name}" "${opt_bg_name}" "${opt_te_name_seq}"
+      _zx__out  "${opt_esc_format}" "${_zx__tail_}"
+      _zx_="${_zx_}${_zx__out_}"
+    fi
   fi
   # ECHO COMPATIBILITY
   if "${opt_use_newline}"; then
@@ -911,7 +978,7 @@ _zx() {
   _zx__gc opt_when_use_color
   _zx__gc use_colors output_type
 
-  _zx__gc __ZX__ESC_ANSI_SEP __ZX__FMT_SEP __ZX__OUTPUT_STREAM_FD
+  _zx__gc __ZX__ESC_ANSI_SEP __ZX__FMT_SEP
 
   _zx__gc _zx__head_
   _zx__gc _zx__out_
@@ -921,11 +988,17 @@ _zx() {
 }
 
 _zx__gc() {
-  _zx__gc_="${_zx__gc_} ${*}"
+  if "${ZX_LAZY_UNSET}"; then
+    _zx__gc_="${_zx__gc_} ${*}"
+  else
+    eval unset -v "${*}"
+  fi
 }
 
 _zx__unset_vars() {
-  eval unset -v "${_zx__gc_}"
+  if test -n "${_zx__gc_}"; then
+    eval unset -v "${_zx__gc_}"
+  fi
 }
 
 _zx__unset_functions() {
