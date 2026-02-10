@@ -1,12 +1,17 @@
 #!/usr/bin/env sh
 # shellcheck enable=all
 
-__here_path="/$(lsof -p $$ | tail -n1 | cut -d '/' -f2-)"
-__here_dir=$(dirname "${__here_path}")
+if test -z "${__EXEC_DIR}"; then
+  realpath=$(realpath -e "$0")
+  __EXEC_DIR=$(dirname "${realpath}")
+  unset -v realpath
+fi
 
-# shellcheck disable=SC1090
-. "${__here_dir}/source/zx.lib.posix.sh"
+_zx_lib=$(realpath -e "${__EXEC_DIR}/source/zx.lib.posix.sh")
+
+# shellcheck source=source/zx.lib.posix.sh
+. "${_zx_lib}"
+
+unset -v _zx_lib
 
 _zx "${@}"
-
-unset __here_path __here_dir _zx_source
