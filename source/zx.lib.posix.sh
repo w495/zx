@@ -16,11 +16,13 @@ test -z "${ZX_LAZY_UNSET}"    && readonly ZX_LAZY_UNSET=false
 test -z "${ZX_EXEC_GETOPTS}"  && readonly ZX_EXEC_GETOPTS=true
 
 # Internal constants
-test -z "${__ZX__FMT_SEP}"        && readonly __ZX__FMT_SEP='\ '
+test -z "${__ZX__FMT_SEP}"        && readonly __ZX__FMT_SEP=':'
 test -z "${__ZX__ESC_ANSI_SEP}"   && readonly __ZX__ESC_ANSI_SEP=';'
 
 if test -z "${__ZX_SPACE_PUNCT}"; then
-  __ZX_SPACE_PUNCT='\t\n\v\f\v\ !#$%&\*+,\-\:;<=>?@\[\\\x5D^_\`{|}~'
+  __ZX_SPACE_PUNCT='[/: ]'
+  # __ZX_SPACE_PUNCT='[[:punct:]|[:space:]]'
+  #   Do not works with posh
 fi
 
 _zx__usage() {
@@ -272,8 +274,8 @@ _zx__punct_to_sep() {
     te_name_seq="${_zx__punct_to_sep_}"
     #           Example: 'b:i:ru:'.
 
-    te_sep_suffix="[${__ZX_SPACE_PUNCT}]*"
-    te_sep_prefix="*[${__ZX_SPACE_PUNCT}]"
+    te_sep_suffix="${__ZX_SPACE_PUNCT}*"
+    te_sep_prefix="*${__ZX_SPACE_PUNCT}"
 
     # shellcheck disable=SC2295
     while test "${te_name_seq#${te_sep_prefix}}" != "${te_name_seq}"; do
@@ -656,7 +658,7 @@ _zx__pos() {
         arg="${arg#${local_sep_prefix}}"
       fi
       if test "${arg#${local_sep_prefix}}" != "${arg}"; then
-        bg_name="${arg%%${local_sep_prefix}}"
+        bg_name="${arg%%${local_sep_suffix}}"
         arg="${arg#${local_sep_prefix}}"
       fi
       if test "${arg#${local_sep_prefix}}" != "${arg}"; then
@@ -977,8 +979,6 @@ _zx() {
   _zx__gc opt_use_head opt_use_tail opt_use_newline
   _zx__gc opt_when_use_color
   _zx__gc use_colors output_type
-
-  _zx__gc __ZX__ESC_ANSI_SEP __ZX__FMT_SEP
 
   _zx__gc _zx__head_
   _zx__gc _zx__out_
