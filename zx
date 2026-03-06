@@ -7,11 +7,11 @@ if test -z "${__EXEC_DIR}"; then
   unset -v realpath
 fi
 
-_zx_lib=$(realpath -e "${__EXEC_DIR}/source/zx.lib.posix.sh")
+_cx_lib=$(realpath -e "${__EXEC_DIR}/source/zx.lib.posix.sh")
 
 # shellcheck source=source/zx.lib.posix.sh
-. "${_zx_lib}"
+. "${_cx_lib}"
 
-unset -v _zx_lib
+unset -v _cx_lib
 
-_zx "${@}"
+_cx "${@}"

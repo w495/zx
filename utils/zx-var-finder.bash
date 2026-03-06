@@ -11,7 +11,7 @@ __here_dir=$(dirname "${__here_path}")
   set -o posix
   set
 ) > /tmp/before.txt
-_zx "${@}"
+_cx "${@}"
 ( 
   set -o posix
   set
@@ -21,4 +21,4 @@ diff /tmp/before.txt  /tmp/after.txt
 rm /tmp/before.txt
 rm /tmp/after.txt
 
-unset __here_path __here_dir _zx_source
+unset __here_path __here_dir _cx_source

@@ -1,0 +1,3 @@
+enable=all
+extended-analysis=true
+shell=busybox

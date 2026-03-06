@@ -11,7 +11,7 @@ __here_dir=$(dirname "${__here_path}")
 check() {
   pat="${1}"
   shift
-  tval="$(_zx "${@}")"
+  tval="$(_cx "${@}")"
   N_CHECKS=$((N_CHECKS + 1))
   bpat=$(printf '%b' "${pat}")
   if test "${tval}" = "${bpat}"; then
