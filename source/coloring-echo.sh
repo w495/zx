@@ -14,7 +14,6 @@
 #
 #  Remaining non-POSIX (GNU/BSD):
 #     - getopt(1) with -l long options (util-linux style)
-#     - sed -r/-E and \W in _cx__color__rename (use GNU/BSD sed or rewrite with awk)
 # ---------------------------------------------------------------
 
 # Runtime flags
@@ -340,20 +339,53 @@ _cx__color__code_case() {
 }
 
 _cx__color__rename() {
-  _cx__colors_="cyan|magenta|yellow|black|red|green|blue|white"
-  _cx__colors_="${_cx__colors_}|c|m|y|k|r|g|b|w"
-  # POSIX: sed -r/-E, \W and /i are not in POSIX sed. Input is lowercased by awk.
-  _cx__patten_="
-      s/^((d|dark|ba|basic)(\W|_)?)(${_cx__colors_})$/-\4/g;
-      s/^((i|l|light|br|bright)(\W|_)?)(${_cx__colors_})?$/+\4/g;
-      s/^(${_cx__colors_})((\W|_)?(\-|d|dark|ba|basic))$/-\1/g;
-      s/^(${_cx__colors_})((\W|_)?(\+|i|l|light|b|br|bright))$/+\1/g;
-      "
+  _cx__colors_="cyan|magenta|yellow|black|red|green|blue|white|c|m|y|k|r|g|b|w"
   _cx__color__rename_=$(
-    awk -v "i=${1}" 'BEGIN{print tolower(i)}' | sed -re "${_cx__patten_}"
+    awk -v i="${1}" -v colors="${_cx__colors_}" '
+      BEGIN {
+        sep = "([^[:alnum:]_]|_)?"
+        n = split(colors, col, "|")
+        # Rule 1: (d|dark|ba|basic)(sep)(color) -> -color
+        pd_len = split("dark basic ba d", pd, " ")
+        # Rule 2: (i|l|light|br|bright)(sep)(color)? -> +color
+        pb_len = split("bright light br l i", pb, " ")
+        # Rule 3: (color)(sep)(-|d|dark|ba|basic) -> -color
+        sd_len = split("dark basic ba d -", sd, " ")
+        # Rule 4: (color)(sep)(+|i|l|light|b|br|bright) -> +color
+        sb_len = split("bright light br b l i +", sb, " ")
+        s = tolower(i)
+        # Apply rule 1
+        for (k = 1; k <= pd_len; k++) {
+          for (j = 1; j <= n; j++) {
+            if (s ~ "^" pd[k] sep col[j] "$") { s = "-" col[j]; k = pd_len + 1; j = n + 1; break }
+          }
+        }
+        # Apply rule 2
+        for (k = 1; k <= pb_len; k++) {
+          if (s ~ "^" pb[k] sep "$") { s = "+"; break }
+          for (j = 1; j <= n; j++) {
+            if (s ~ "^" pb[k] sep col[j] "$") { s = "+" col[j]; k = pb_len + 1; j = n + 1; break }
+          }
+        }
+        # Apply rule 3 (escape - for literal in regex)
+        for (j = 1; j <= n; j++) {
+          for (k = 1; k <= sd_len; k++) {
+            suf = sd[k]; if (suf == "-") suf = "\\-"
+            if (s ~ "^" col[j] sep suf "$") { s = "-" col[j]; j = n + 1; k = sd_len + 1; break }
+          }
+        }
+        # Apply rule 4 (escape + for literal in regex)
+        for (j = 1; j <= n; j++) {
+          for (k = 1; k <= sb_len; k++) {
+            suf = sb[k]; if (suf == "+") suf = "\\+"
+            if (s ~ "^" col[j] sep suf "$") { s = "+" col[j]; j = n + 1; k = sb_len + 1; break }
+          }
+        }
+        print s
+      }
+    '
   )
   _cx__gc _cx__colors_
-  _cx__gc _cx__patten_
 }
 
 _cx__color__std_name() {

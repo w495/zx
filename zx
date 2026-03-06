@@ -7,7 +7,7 @@ if test -z "${__EXEC_DIR}"; then
   unset -v realpath
 fi
 
-_cx_lib=$(realpath -e "${__EXEC_DIR}/source/zx.lib.posix.sh")
+_cx_lib=$(realpath -e "${__EXEC_DIR}/source/coloring-echo.sh")
 
 # shellcheck source=source/zx.lib.posix.sh
 . "${_cx_lib}"
