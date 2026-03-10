@@ -1,3 +1,5 @@
 enable=all
 extended-analysis=true
+external-sources=true
+sources=./source/base/color-out.lib.sh,./source/color-echo.lib.sh
 shell=busybox

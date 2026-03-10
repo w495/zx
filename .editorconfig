@@ -1,5 +1,6 @@
 [*]
 ij_visual_guides = 72, 80, 120, 200
+# visual_guides = ij_visual_guides
 
 [{*.sh,*.ash,*.osh,*.zsh,*.bash,*.dash,*.yasj,*.ysh,*.psh}]
 indent_size = 2
